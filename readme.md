@@ -1,7 +1,7 @@
 # Личный проект «Типотека» [![Build status][travis-image]][travis-url]
 
 * Студент: [Максим Теплов](https://up.htmlacademy.ru/nodejs/3/user/61709).
-* Наставник: `Никита Куцелай`.
+* Наставник: [Никита Куцелай](https://htmlacademy.ru/profile/id32750).
 
 ---
 

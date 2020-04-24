@@ -2,15 +2,26 @@
 
 const DEFAULT_COMMAND = `--help`;
 const USER_ARGV_INDEX = 2;
+
 const ExitCode = {
   ERROR: 1,
   SUCCESS: 0,
 };
-const DEFAULT_COUNT = 1;
-const MAX_ARTICLE_COUNT = 1000;
+
+const GeneratorSlicer = {
+  MIN: 0,
+  NAX: 4
+};
+
+const ArticleCount = {
+  DEFAULT: 1,
+  MAX: 1000
+};
+
 const FILE_NAME = `mocks.json`;
 const MONTH_START = 2;
 const DATE_START = 1;
+
 const TITLES = [
   `Ёлки. История деревьев`,
   `Как перестать беспокоиться и начать жить`,
@@ -64,13 +75,13 @@ const CATEGORIES = [
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
-  MAX_ARTICLE_COUNT,
-  ExitCode,
-  DEFAULT_COUNT,
   FILE_NAME,
   MONTH_START,
   DATE_START,
   TITLES,
   ANNOUNCEMENTS,
-  CATEGORIES
+  CATEGORIES,
+  ExitCode,
+  GeneratorSlicer,
+  ArticleCount,
 };

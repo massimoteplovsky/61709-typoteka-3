@@ -8,49 +8,57 @@ const {
 } = require(`../../utils`);
 
 const {
-  DEFAULT_COUNT,
-  MAX_ARTICLE_COUNT,
+  ArticleCount,
   FILE_NAME,
   MONTH_START,
   DATE_START,
   TITLES,
   ANNOUNCEMENTS,
   CATEGORIES,
+  GeneratorSlicer,
   ExitCode
 } = require(`../../constants`);
 
+const getTitle = (titles) => TITLES[getRandomInt(0, titles.length - 1)];
+const getAnnounces = (announcements) => shuffle(announcements).slice(GeneratorSlicer.MIN, GeneratorSlicer.MAX).join(` `);
+const getFullText = (announcements) => shuffle(announcements).slice(GeneratorSlicer.MIN, getRandomInt(0, announcements.length - 1)).join(` `);
+const getCategories = (categories) => shuffle(categories).slice(GeneratorSlicer.MIN, getRandomInt(0, categories.length - 1));
+
 const generateArticles = (count) => (
   Array(count).fill({}).map(() => ({
-    title: TITLES[getRandomInt(0, TITLES.length - 1)],
-    announce: shuffle(ANNOUNCEMENTS).slice(0, 4).join(` `),
-    fullText: shuffle(ANNOUNCEMENTS).slice(0, getRandomInt(0, ANNOUNCEMENTS.length - 1)).join(` `),
+    title: getTitle(TITLES),
+    announce: getAnnounces(ANNOUNCEMENTS),
+    fullText: getFullText(ANNOUNCEMENTS),
     createdDate: generateRandomDate(
-        new Date(new Date().getFullYear(), new Date().getMonth() - MONTH_START, DATE_START),
+        new Date(
+            new Date().getFullYear(),
+            new Date().getMonth() - MONTH_START,
+            DATE_START
+        ),
         new Date()
     ),
-    category: shuffle(CATEGORIES).slice(0, getRandomInt(0, CATEGORIES.length - 1)),
+    category: getCategories(CATEGORIES)
   }))
 );
 
 module.exports = {
   name: `--generate`,
   run(userInputValue) {
-    const countArticle = Number.parseInt(userInputValue, 10) || DEFAULT_COUNT;
+    const articleQuantity = Math.abs(Number.parseInt(userInputValue, 10) || ArticleCount.DEFAULT);
 
-    if (countArticle > MAX_ARTICLE_COUNT) {
-      console.log(`Не больше ${MAX_ARTICLE_COUNT} публикаций`);
+    if (articleQuantity > ArticleCount.MAX) {
+      console.log(`Не больше ${ArticleCount.MAX} публикаций`);
       process.exit(ExitCode.SUCCESS);
     }
 
-    const content = JSON.stringify(generateArticles(Math.abs(countArticle)));
+    const content = JSON.stringify(generateArticles(articleQuantity));
 
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        return console.error(`Can't write data to file...`);
-      }
-
+    try {
+      fs.writeFileSync(FILE_NAME, content);
       return console.log(`Operation success. File created.`);
-    });
-
+    } catch (e) {
+      console.error(`Can't write data to file...`);
+      return process.exit(ExitCode.ERROR);
+    }
   }
 };

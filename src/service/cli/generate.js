@@ -1,11 +1,12 @@
 'use strict';
 
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
 const {
   getRandomInt,
   shuffle,
   generateRandomDate
 } = require(`../../utils`);
+const chalk = require(`chalk`);
 
 const {
   ArticleCount,
@@ -43,21 +44,21 @@ const generateArticles = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(userInputValue) {
+  async run(userInputValue) {
     const articleQuantity = Math.abs(Number.parseInt(userInputValue, 10) || ArticleCount.DEFAULT);
 
     if (articleQuantity > ArticleCount.MAX) {
-      console.log(`Не больше ${ArticleCount.MAX} публикаций`);
+      console.log(chalk.red(`Не больше ${ArticleCount.MAX} публикаций`));
       process.exit(ExitCode.SUCCESS);
     }
 
     const content = JSON.stringify(generateArticles(articleQuantity));
 
     try {
-      fs.writeFileSync(FILE_NAME, content);
-      return console.log(`Operation success. File created.`);
+      await fs.writeFile(FILE_NAME, content);
+      return console.log(chalk.green(`Operation success. File created.`));
     } catch (e) {
-      console.error(`Can't write data to file...`);
+      console.error(chalk.red(`Can't write data to file...`));
       return process.exit(ExitCode.ERROR);
     }
   }

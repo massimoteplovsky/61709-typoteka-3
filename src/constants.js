@@ -1,6 +1,7 @@
 'use strict';
 
 const DEFAULT_COMMAND = `--help`;
+const DEFAULT_PORT = 3000;
 const USER_ARGV_INDEX = 2;
 
 const ExitCode = {
@@ -30,12 +31,22 @@ const DateOption = {
   DATE_START: 1
 };
 
+const HttpCode = {
+  SUCCESS: 200,
+  NOT_FOUND: 404,
+  INTERNAL_SERVER_ERROR: 500,
+  FORBIDDEN: 403,
+  UNAUTHORIZED: 401
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
+  DEFAULT_PORT,
   FilePath,
   DateOption,
   ExitCode,
   GeneratorSlicer,
   ArticleCount,
+  HttpCode
 };

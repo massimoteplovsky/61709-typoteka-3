@@ -1,7 +1,7 @@
 'use strict';
 
-const chalk = require(`chalk`);
 const fs = require(`fs`).promises;
+const chalk = require(`chalk`);
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);

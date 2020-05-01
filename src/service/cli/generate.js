@@ -1,13 +1,14 @@
 'use strict';
 
 const fs = require(`fs`).promises;
+const chalk = require(`chalk`);
+
 const {
   getRandomInt,
   shuffle,
   generateRandomDate,
   readContent
 } = require(`../../utils`);
-const chalk = require(`chalk`);
 
 const {
   ArticleCount,
@@ -41,11 +42,11 @@ const generateArticles = (count, titles, categories, sentences) => (
 
 module.exports = {
   name: `--generate`,
-  async run(userInputValue) {
+  async run(count) {
     const titles = await readContent(FilePath.TITLES);
     const categories = await readContent(FilePath.CATEGORIES);
     const sentences = await readContent(FilePath.SENTENCES);
-    const articleQuantity = Math.abs(Number.parseInt(userInputValue, 10) || ArticleCount.DEFAULT);
+    const articleQuantity = Math.abs(Number.parseInt(count, 10) || ArticleCount.DEFAULT);
 
     if (articleQuantity > ArticleCount.MAX) {
       console.log(chalk.red(`Не больше ${ArticleCount.MAX} публикаций`));

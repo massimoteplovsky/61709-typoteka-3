@@ -5,7 +5,7 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
 const {
-  DEFAULT_PORT,
+  DefaultPort,
   FilePath,
   HttpCode,
   ExitCode
@@ -55,7 +55,7 @@ const onClientConnect = async (req, res) => {
 module.exports = {
   name: `--server`,
   run(customPort) {
-    const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
+    const port = Number.parseInt(customPort, 10) || DefaultPort.SERVICE_SERVER;
 
     http.createServer(onClientConnect)
       .listen(port)

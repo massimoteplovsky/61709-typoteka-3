@@ -1,8 +1,12 @@
 'use strict';
 
 const DEFAULT_COMMAND = `--help`;
-const DEFAULT_PORT = 3000;
 const USER_ARGV_INDEX = 2;
+
+const DefaultPort = {
+  FRONT_SERVER: 8080,
+  SERVICE_SERVER: 3000
+};
 
 const ExitCode = {
   ERROR: 1,
@@ -42,7 +46,7 @@ const HttpCode = {
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
-  DEFAULT_PORT,
+  DefaultPort,
   FilePath,
   DateOption,
   ExitCode,

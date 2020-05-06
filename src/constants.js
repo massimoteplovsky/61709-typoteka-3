@@ -2,6 +2,7 @@
 
 const DEFAULT_COMMAND = `--help`;
 const USER_ARGV_INDEX = 2;
+const PUBLIC_DIR = `public`;
 
 const DefaultPort = {
   FRONT_SERVER: 8080,
@@ -46,6 +47,7 @@ const HttpCode = {
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
+  PUBLIC_DIR,
   DefaultPort,
   FilePath,
   DateOption,

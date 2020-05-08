@@ -42,9 +42,25 @@ const readContent = async (filePath) => {
   }
 };
 
+const readContentJSON = async (filePath) => {
+  try {
+    const content = await fs.readFile(filePath, `utf8`);
+
+    if (!content.trim().length) {
+      return [];
+    }
+
+    return JSON.parse(content);
+  } catch (err) {
+    console.error(chalk.red(err));
+    return [];
+  }
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
   generateRandomDate,
-  readContent
+  readContent,
+  readContentJSON
 };

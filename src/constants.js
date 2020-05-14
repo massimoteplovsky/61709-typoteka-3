@@ -3,6 +3,9 @@
 const DEFAULT_COMMAND = `--help`;
 const USER_ARGV_INDEX = 2;
 const PUBLIC_DIR = `public`;
+const MAX_ID_LENGTH = 6;
+const MAX_COMMENTS_COUNT = 4;
+const API_PREFIX = `/api`;
 
 const DefaultPort = {
   FRONT_SERVER: 8080,
@@ -28,7 +31,8 @@ const FilePath = {
   MOCKS: `mocks.json`,
   SENTENCES: `./data/sentences.txt`,
   TITLES: `./data/titles.txt`,
-  CATEGORIES: `./data/categories.txt`
+  CATEGORIES: `./data/categories.txt`,
+  COMMENTS: `./data/comments.txt`
 };
 
 const DateOption = {
@@ -38,9 +42,11 @@ const DateOption = {
 
 const HttpCode = {
   SUCCESS: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  FORBIDDEN: 403,
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
-  FORBIDDEN: 403,
   UNAUTHORIZED: 401
 };
 
@@ -48,6 +54,9 @@ module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
   PUBLIC_DIR,
+  MAX_ID_LENGTH,
+  MAX_COMMENTS_COUNT,
+  API_PREFIX,
   DefaultPort,
   FilePath,
   DateOption,

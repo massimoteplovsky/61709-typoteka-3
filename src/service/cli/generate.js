@@ -2,6 +2,7 @@
 
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
+const {nanoid} = require(`nanoid`);
 
 const {
   getRandomInt,
@@ -11,6 +12,8 @@ const {
 } = require(`../../utils`);
 
 const {
+  MAX_ID_LENGTH,
+  MAX_COMMENTS_COUNT,
   ArticleCount,
   DateOption,
   FilePath,
@@ -18,13 +21,38 @@ const {
   ExitCode
 } = require(`../../constants`);
 
-const getTitle = (titles) => titles[getRandomInt(0, titles.length - 1)];
-const getAnnounces = (sentences) => shuffle(sentences).slice(GeneratorSlicer.MIN, GeneratorSlicer.MAX).join(` `);
-const getFullText = (sentences) => shuffle(sentences).slice(GeneratorSlicer.MIN, getRandomInt(0, sentences.length - 1)).join(` `);
-const getCategories = (categories) => shuffle(categories).slice(GeneratorSlicer.MIN, getRandomInt(0, categories.length - 1));
+const getTitle = (titles) => {
+  return titles[getRandomInt(0, titles.length - 1)];
+};
 
-const generateArticles = (count, titles, categories, sentences) => (
+const getAnnounces = (sentences) => {
+  return shuffle(sentences)
+        .slice(GeneratorSlicer.MIN, GeneratorSlicer.MAX)
+        .join(` `);
+};
+
+const getFullText = (sentences) => {
+  return shuffle(sentences)
+        .slice(GeneratorSlicer.MIN, getRandomInt(1, sentences.length - 1))
+        .join(` `);
+};
+
+const getCategories = (categories) => {
+  return shuffle(categories)
+        .slice(GeneratorSlicer.MIN, getRandomInt(1, categories.length - 1));
+};
+
+const getComments = (count, comments) => {
+  return Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
+    text: shuffle(comments).slice(0, getRandomInt(1, comments.length - 1)).join(` `)
+  }));
+};
+
+const generateArticles = (count, titles, categories, sentences, comments) => (
+
   Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
     title: getTitle(titles),
     announce: getAnnounces(sentences),
     fullText: getFullText(sentences),
@@ -36,7 +64,8 @@ const generateArticles = (count, titles, categories, sentences) => (
         ),
         new Date()
     ),
-    category: getCategories(categories)
+    category: getCategories(categories),
+    comments: getComments(getRandomInt(1, MAX_COMMENTS_COUNT), comments)
   }))
 );
 
@@ -46,6 +75,7 @@ module.exports = {
     const titles = await readContent(FilePath.TITLES);
     const categories = await readContent(FilePath.CATEGORIES);
     const sentences = await readContent(FilePath.SENTENCES);
+    const comments = await readContent(FilePath.COMMENTS);
     const articleQuantity = Math.abs(Number.parseInt(count, 10) || ArticleCount.DEFAULT);
 
     if (articleQuantity > ArticleCount.MAX) {
@@ -53,7 +83,9 @@ module.exports = {
       process.exit(ExitCode.SUCCESS);
     }
 
-    const content = JSON.stringify(generateArticles(articleQuantity, titles, categories, sentences));
+    const content = JSON.stringify(
+        generateArticles(articleQuantity, titles, categories, sentences, comments)
+    );
 
     try {
       await fs.writeFile(FilePath.MOCKS, content);

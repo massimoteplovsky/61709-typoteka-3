@@ -2,18 +2,18 @@
 
 const chalk = require(`chalk`);
 const express = require(`express`);
-const postsRouter = require(`../routes/postsRoutes`);
-
+const apiRoutes = require(`../api/api-routes`);
 const {
+  API_PREFIX,
   HttpCode,
   ExitCode
 } = require(`../../constants`);
 
 const app = express();
+app.disable(`x-powered-by`);
 
 app.use(express.json());
-
-app.use(`/posts`, postsRouter);
+app.use(API_PREFIX, apiRoutes);
 
 app.use((req, res) => {
   const notFoundMessageText = `Not found`;

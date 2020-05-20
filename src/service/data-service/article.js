@@ -11,8 +11,7 @@ class ArticleService {
   create(article) {
     const newArticle = Object.assign(
         {
-          id: nanoid(MAX_ID_LENGTH),
-          comments: []
+          id: nanoid(MAX_ID_LENGTH)
         },
         article
     );

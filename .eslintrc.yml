@@ -4,5 +4,7 @@ parserOptions:
 env:
   es6: true
   node: true
+  commonjs: true
+  jest: true
 
 extends: 'htmlacademy/node'

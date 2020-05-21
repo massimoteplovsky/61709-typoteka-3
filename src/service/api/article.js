@@ -23,7 +23,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Article with ID ${articleId} not found`
+        message: `Article with id: ${articleId} not found`
       });
     }
 
@@ -44,7 +44,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Article with ID ${articleId} not found`
+        message: `Article with id: ${articleId} not found`
       });
     }
 
@@ -61,7 +61,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Article with ID ${articleId} not found`
+        message: `Article with id: ${articleId} not found`
       });
     }
 
@@ -78,7 +78,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Article with ID ${articleId} not found`
+        message: `Article with id: ${articleId} not found`
       });
     }
 
@@ -98,7 +98,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Article with ID ${articleId} not found`
+        message: `Article with id: ${articleId} not found`
       });
     }
 
@@ -109,7 +109,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Comment with ID ${commentId} not found`
+        message: `Comment with id: ${commentId} not found`
       });
     }
 
@@ -125,7 +125,7 @@ const getArticlesRouter = (articleService, commentService) => {
       .json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Article with ID ${articleId} not found`
+        message: `Article with id: ${articleId} not found`
       });
     }
 

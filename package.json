@@ -22,7 +22,7 @@
   },
   "scripts": {
     "test": "npm run test::rest",
-    "test::rest": "jest | pino-pretty > ./src/service/logs/app-test.log",
+    "test::rest": "jest",
     "eslint": "eslint --ext .js src/",
     "start": "node ./src/service/service.js",
     "server": "cross-env LOG_LEVEL=error nodemon ./src/service/service.js --server 3000 | pino-pretty > ./src/service/logs/app.log",

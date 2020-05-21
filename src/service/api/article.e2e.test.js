@@ -5,6 +5,9 @@ const {getServer} = require(`../api-server`);
 const {getMockData} = require(`../lib/get-mock-data`);
 const {HttpCode} = require(`../../constants`);
 
+let server;
+let mockData;
+
 const newArticleData = {
   title: `Новинки музыки`,
   announce: `Простые ежедневные упражнения помогут достичь успеха.`,
@@ -30,9 +33,6 @@ const updatedArticleData = {
   category: [`Авто`],
   comments: []
 };
-
-let server;
-let mockData;
 
 beforeAll(async () => {
   server = await getServer();

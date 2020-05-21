@@ -1,9 +1,9 @@
 'use strict';
 
 const express = require(`express`);
-const {getMockData} = require(`../lib/get-mock-data`);
-const {getLogger} = require(`../logger`);
 const expressPinoLogger = require(`express-pino-logger`);
+const {getLogger} = require(`../logger`);
+const {getMockData} = require(`../lib/get-mock-data`);
 
 const {
   API_PREFIX,

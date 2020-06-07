@@ -4,21 +4,24 @@ const request = require(`supertest`);
 const {getServer} = require(`../api-server`);
 const {getMockData} = require(`../lib/get-mock-data`);
 const {HttpCode} = require(`../../constants`);
+const {formatArticleDate} = require(`../../utils`);
 
 const newArticleData = {
   title: `Новинки музыки`,
   announce: `Простые ежедневные упражнения помогут достичь успеха.`,
   fullText: `Тяжело найти качественную музыку`,
-  createdDate: `2020-04-17 20:25:31`,
+  createdDate: `2020-04-17 20:25`,
   category: [`Музыка`],
+  picture: ``,
   comments: []
 };
 
 const incorrectArticleData = {
   announce: `Простые ежедневные упражнения помогут достичь успеха.`,
   fullText: `Тяжело найти качественную музыку`,
-  createdDate: `2020-04-17 20:25:31`,
+  createdDate: `2020-04-17 20:25`,
   category: [`Музыка`],
+  picture: ``,
   comments: []
 };
 
@@ -26,8 +29,9 @@ const updatedArticleData = {
   title: `Новинки автопрома`,
   announce: `Простые ежедневные упражнения помогут достичь успеха.`,
   fullText: `Тяжело найти хороший б/у автомобиль`,
-  createdDate: `2020-05-17 20:25:31`,
+  createdDate: `2020-04-17 20:25`,
   category: [`Авто`],
+  picture: ``,
   comments: []
 };
 
@@ -47,7 +51,7 @@ describe(`Articles API end-to-end tests`, () => {
       const res = await request(server).get(`/api/articles`);
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
-      expect(res.body).toStrictEqual(mockData);
+      expect(res.body).toStrictEqual(formatArticleDate(mockData));
     });
   });
 
@@ -59,7 +63,7 @@ describe(`Articles API end-to-end tests`, () => {
       const res = await request(server).get(`/api/articles/${articleId}`);
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
-      expect(res.body).toStrictEqual(article);
+      expect(res.body).toStrictEqual({...article, createdDate: res.body.createdDate});
     });
 
     test(`Get article by id with status code 404 (article not found)`, async () => {
@@ -76,7 +80,11 @@ describe(`Articles API end-to-end tests`, () => {
 
     test(`Must create a new article and return it with status code 201`, async () => {
       const res = await request(server).post(`/api/articles`).send(newArticleData);
-      const createdArticle = {...newArticleData, id: res.body.id};
+      const createdArticle = {
+        ...newArticleData,
+        id: res.body.id,
+        createdDate: res.body.createdDate
+      };
 
       expect(res.statusCode).toBe(HttpCode.CREATED);
       expect(res.body).toStrictEqual(createdArticle);
@@ -188,7 +196,11 @@ describe(`Articles API end-to-end tests`, () => {
     test(`Update article by id with status code 200`, async () => {
       const articleId = mockData[0].id;
       const res = await request(server).put(`/api/articles/${articleId}`).send(updatedArticleData);
-      const updatedArticle = {...updatedArticleData, id: articleId};
+      const updatedArticle = {
+        ...updatedArticleData,
+        id: articleId,
+        createdDate: res.body.createdDate
+      };
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
       expect(res.body).toStrictEqual(updatedArticle);
@@ -219,7 +231,11 @@ describe(`Articles API end-to-end tests`, () => {
     test(`Delete article by id with status code 200`, async () => {
       const articleId = mockData[0].id;
       const res = await request(server).delete(`/api/articles/${articleId}`);
-      const deletedArticle = {...updatedArticleData, id: res.body.id};
+      const deletedArticle = {
+        ...updatedArticleData,
+        id: res.body.id,
+        createdDate: res.body.createdDate
+      };
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
       expect(res.body).toStrictEqual(deletedArticle);

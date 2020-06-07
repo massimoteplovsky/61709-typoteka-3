@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require(`fs`).promises;
+const moment = require(`moment`);
 const chalk = require(`chalk`);
 
 const getRandomInt = (min, max) => {
@@ -18,18 +19,8 @@ const shuffle = (someArray) => {
   return someArray;
 };
 
-const changeFormat = (format) => format < 10 ? `0${format}` : format;
-
 const generateRandomDate = (start, end) => {
-  const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  const year = randomDate.getFullYear();
-  const month = changeFormat(randomDate.getMonth() + 1);
-  const dateOfMonth = changeFormat(randomDate.getDate());
-  const hours = changeFormat(randomDate.getHours());
-  const minutes = changeFormat(randomDate.getMinutes());
-  const seconds = changeFormat(randomDate.getSeconds());
-
-  return `${year}-${month}-${dateOfMonth} ${hours}:${minutes}:${seconds}`;
+  return moment.utc(moment(start.getTime() + Math.random() * (end.getTime() - start.getTime()))).format();
 };
 
 const readContent = async (filePath) => {
@@ -57,10 +48,66 @@ const readContentJSON = async (filePath) => {
   }
 };
 
+const getMostDiscussedArticles = (articles) => {
+  return articles.filter((article) => article.comments.length > 0)
+                .sort((a, b) => b.comments.length - a.comments.length)
+                .slice(0, 4);
+};
+
+const convertDate = (dateToCheck) => {
+  const date = moment(dateToCheck, `DD.MM.YYYY`);
+
+  if (date.isSame(moment(), `day`, `month`, `year`)) {
+    return moment.utc().format();
+  }
+
+  return moment.utc(date).format();
+};
+
+const copyObject = (obj) => JSON.parse(JSON.stringify(obj));
+
+const formatArticleDate = (articleData) => {
+
+  const DATE_FORMAT = `DD.MM.YYYY, HH:mm`;
+  const makeDateFormat = (date) => moment(date).format(DATE_FORMAT);
+
+  if (Array.isArray(articleData)) {
+    const newArticleList = copyObject(articleData);
+    return newArticleList.map((article) => {
+      article.createdDate = makeDateFormat(article.createdDate);
+      return article;
+    });
+  }
+
+  return {...articleData, createdDate: makeDateFormat(articleData.createdDate)};
+};
+
+const highlightArticleTitle = (articles, searchedText) => {
+  const newArticleList = copyObject(articles);
+  return newArticleList.map((article) => {
+    const index = article.title.toLowerCase().indexOf(searchedText.toLowerCase());
+
+    if (index !== -1) {
+      article.title = `
+        ${article.title.slice(0, index)}
+        <b>
+        ${article.title.slice(index, index + searchedText.length)}
+        </b>
+        ${article.title.slice(index + searchedText.length)}`;
+    }
+
+    return article;
+  });
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
   generateRandomDate,
   readContent,
-  readContentJSON
+  readContentJSON,
+  getMostDiscussedArticles,
+  convertDate,
+  formatArticleDate,
+  highlightArticleTitle
 };

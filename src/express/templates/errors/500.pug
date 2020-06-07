@@ -1,19 +1,11 @@
 doctype html
 html(lang='ru')
-  head
-    meta(charset='UTF-8')
-    meta(name='description' content='Личный блог Типотека')
-    meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    meta(http-equiv='X-UA-Compatible' content='ie=edge')
-    title Типотека
-    link(rel="shortcut icon" href="/img/icons/logo-image-only.svg" type="image/x-icon")
-    link(rel="preload" href="/fonts/Inter-Regular.woff2" as="font" crossorigin="anonymous")
-    link(rel="preload" href="/fonts/Inter-Medium.woff2" as="font" crossorigin="anonymous")
-    link(rel="preload" href="/fonts/SFProDisplay-Regular.woff2" as="font" crossorigin="anonymous")
-    link(rel="stylesheet" href="css/style.min.css")
+  include ../partials/head.pug
   body
     .wrapper-color
-      include ../partials/header.pug
+      header.header.header--error
+        a.header__logo.header__logo--500.logo(href='/')
+          img(src='img/icons/logo.svg', alt='логотип Тайпотеки')
       main
         h1.visually-hidden Ошибка 500
         section.error.error--500
@@ -23,3 +15,4 @@ html(lang='ru')
             | Попробуйте повторить попытку позже.
           a.error__link.text.text--big(href='/') Вернуться на главную
       include ../partials/footer.pug
+

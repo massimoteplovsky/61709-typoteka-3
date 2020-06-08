@@ -2,14 +2,19 @@
 
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../constants`);
-const searchRouter = new Router();
+const {
+  formatArticleDate,
+  highlightArticleTitle
+} = require(`../../utils`);
 
 const getSearchRouter = (searchService) => {
+
+  const searchRouter = new Router();
 
   searchRouter.get(`/`, (req, res) => {
     const {query} = req.query;
 
-    if (!query) {
+    if (typeof (query) === `undefined`) {
       return res.status(HttpCode.BAD_REQUEST)
       .json({
         error: true,
@@ -19,7 +24,9 @@ const getSearchRouter = (searchService) => {
     }
 
     const searchedArticles = searchService.findAll(query);
-    return res.status(HttpCode.SUCCESS).json(searchedArticles);
+    return res.status(HttpCode.SUCCESS).json(
+        highlightArticleTitle(formatArticleDate(searchedArticles), query)
+    );
   });
 
   return searchRouter;

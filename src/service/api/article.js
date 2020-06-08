@@ -4,6 +4,7 @@ const {Router} = require(`express`);
 const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
 const commentValidator = require(`../middlewares/comment-validator`);
+const {formatArticleDate} = require(`../../utils`);
 
 const articlesRouter = new Router();
 
@@ -11,7 +12,7 @@ const getArticlesRouter = (articleService, commentService) => {
 
   articlesRouter.get(`/`, (req, res) => {
     const articles = articleService.findAll();
-    return res.status(HttpCode.SUCCESS).json(articles);
+    return res.status(HttpCode.SUCCESS).json(formatArticleDate(articles));
   });
 
   articlesRouter.get(`/:articleId`, (req, res) => {
@@ -27,12 +28,12 @@ const getArticlesRouter = (articleService, commentService) => {
       });
     }
 
-    return res.status(HttpCode.SUCCESS).json(article);
+    return res.status(HttpCode.SUCCESS).json(formatArticleDate(article));
   });
 
   articlesRouter.post(`/`, articleValidator, (req, res) => {
     const newArticle = articleService.create(req.body);
-    return res.status(HttpCode.CREATED).json(newArticle);
+    return res.status(HttpCode.CREATED).json(formatArticleDate(newArticle));
   });
 
   articlesRouter.put(`/:articleId`, articleValidator, (req, res) => {
@@ -49,7 +50,7 @@ const getArticlesRouter = (articleService, commentService) => {
     }
 
     const updatedArticle = articleService.update(articleId, req.body);
-    return res.status(HttpCode.SUCCESS).json(updatedArticle);
+    return res.status(HttpCode.SUCCESS).json(formatArticleDate(updatedArticle));
   });
 
   articlesRouter.delete(`/:articleId`, (req, res) => {
@@ -66,7 +67,7 @@ const getArticlesRouter = (articleService, commentService) => {
     }
 
     const deletedArticle = articleService.delete(articleId);
-    return res.status(HttpCode.SUCCESS).json(deletedArticle);
+    return res.status(HttpCode.SUCCESS).json(formatArticleDate(deletedArticle));
   });
 
   articlesRouter.get(`/:articleId/comments`, (req, res) => {

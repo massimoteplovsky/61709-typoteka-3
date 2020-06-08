@@ -18,10 +18,11 @@ const getMyRouter = (service) => {
   myRouter.get(`/comments`, async (req, res, next) => {
     try {
       const articles = await service.getAllArticles();
-      return res.render(
-          `comments`,
-          {comments: articles.slice(0, 3).reduce((comments, article) => comments.concat(article.comments), [])}
-      );
+      const articleComments = articles.slice(0, 3).map((article) => service.getArticleComments(article.id));
+
+      return Promise.all(articleComments).then((comments) => {
+        return res.render(`comments`, {comments: comments.flat()});
+      });
     } catch (err) {
       return next(err);
     }

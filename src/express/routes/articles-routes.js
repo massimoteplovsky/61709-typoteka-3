@@ -35,7 +35,7 @@ const getArticlesRouter = (service) => {
         errorByField: validationResult(req).mapped()
       };
       const file = req.file;
-      let formFieldsData = req.body;
+      let formFieldsData = {...req.body};
 
       if (file && (!VALID_MIME_TYPES.includes(file.mimetype) || file.size > MAX_FILE_SIZE)) {
         errors.errorsList.push(fileErrorMsg);

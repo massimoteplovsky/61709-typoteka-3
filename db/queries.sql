@@ -97,7 +97,7 @@ INNER JOIN users
 ORDER BY created_date DESC
 LIMIT 5
 
-/* Get offer comments with user data ordered by novelty*/
+/* Get article comments with user data ordered by novelty*/
 SELECT
 	comments.id AS "Идентификатор комментария",
 	comments.article_id AS "Идентификатор публикации",

@@ -20,8 +20,8 @@ SELECT
 	categories.id AS "Идентификатор категории",
 	categories.title AS "Наименование категории",
 	count(articles_categories.category_id) AS "Количество публикаций в категории"
-FROM articles_categories
-INNER JOIN categories
+FROM categories
+LEFT JOIN articles_categories
 	ON articles_categories.category_id = categories.id
 GROUP BY categories.id
 ORDER BY categories.id ASC

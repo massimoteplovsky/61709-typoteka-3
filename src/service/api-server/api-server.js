@@ -3,6 +3,7 @@
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const {getLogger} = require(`../logger`);
+const {connectDB} = require(`../db-connect`);
 const {getMockData} = require(`../lib/get-mock-data`);
 
 const {
@@ -27,6 +28,8 @@ const getServer = async () => {
   const server = express();
   const logger = getLogger();
   const mockData = await getMockData();
+
+  await connectDB();
 
   server.disable(`x-powered-by`);
   server.use(expressPinoLogger(logger));

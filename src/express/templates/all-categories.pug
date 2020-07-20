@@ -6,44 +6,37 @@ block content
     section.main-page__category.category
       h1.category__title Категории
       .category__add-form
-        form(action='#', method='POST')
-          input#add-form-add-category(type='text', name='category', placeholder='Новая категория')
+        form(action='/categories', method='POST')
+          input#add-form-add-category(
+            type='text'
+            name='title'
+            placeholder='Новая категория'
+            value=`${categoryData && !categoryId ? categoryData.title : ``}`
+          )
           label(for='add-form-add-category')
             span.visually-hidden Добавить категорию
           button.category__button.button.button--category(type='submit') Добавить
-      ul.category__list
-        li.category__list-item
-          form(action='#', method='POST')
-            input#modify-form-category-1(type='text', name='category', value='Жизнь и путешествия')
-            label(for='modify-form-category-1')
-              span.visually-hidden Редактировать категорию
-            button.category__button.button.button--category(type='submit') Сохранить
-            button.category__button.button.button--category(type='button') Удалить
-        li.category__list-item
-          form(action='#', method='POST')
-            input#modify-form-category-2(type='text', name='category', value='Путешествия')
-            label(for='modify-form-category-2')
-              span.visually-hidden Редактировать категорию
-            button.category__button.button.button--category(type='submit') Сохранить
-            button.category__button.button.button--category(type='button') Удалить
-        li.category__list-item
-          form(action='#', method='POST')
-            input#modify-form-category-3(type='text', name='category', value='Дизайн и программирование')
-            label(for='modify-form-category-3')
-              span.visually-hidden Редактировать категорию
-            button.category__button.button.button--category(type='submit') Сохранить
-            button.category__button.button.button--category(type='button') Удалить
-        li.category__list-item
-          form(action='#', method='POST')
-            input#modify-form-category-4(type='text', name='category', value='Другое')
-            label(for='modify-form-category-4')
-              span.visually-hidden Редактировать категорию
-            button.category__button.button.button--category(type='submit') Сохранить
-            button.category__button.button.button--category(type='button') Удалить
-        li.category__list-item.category__list-item--last
-          form(action='#', method='POST')
-            input#modify-form-category-5(type='text', name='category', value='Личное')
-            label(for='modify-form-category-5')
-              span.visually-hidden Редактировать категорию
-            button.category__button.button.button--category(type='submit') Сохранить
-            button.category__button.button.button--category(type='button') Удалить
+        if error && !categoryId
+          p.form__error-message= error.title.msg
+      if categories.length > 0
+        ul.category__list
+          each category in categories
+            li.category__list-item(style=`flex-wrap: wrap;`)
+              form(
+                action=`/categories/${category.id}`
+                method='POST'
+                style='flex-grow: 1; width: auto'
+              )
+                input#modify-form-category-1(
+                  type='text'
+                  name='title'
+                  value=`${categoryData && category.id === Number(categoryId) ? categoryData.title : category.title}`
+                )
+                label(for='modify-form-category-1')
+                  span.visually-hidden Редактировать категорию
+                button.category__button.button.button--category(type='submit') Сохранить
+              if Number(category.articlesCount) === 0
+                form(action=`/categories/${category.id}` method="GET")
+                  button.category__button.button.button--category(type='submit') Удалить
+              if error && categoryId && category.id === Number(categoryId)
+                p.form__error-message(style=`padding-left: 5px;`)= error.title.msg

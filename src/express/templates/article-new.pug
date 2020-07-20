@@ -6,7 +6,12 @@ block content
     section.modal.modal--flex
       .popup.popup--new-publication.popup--flex
         .new-publication
-          form(action='/articles/add', method='POST' enctype="multipart/form-data" autocomplete="off")
+          form(
+            action='/articles/add'
+            method='POST'
+            enctype="multipart/form-data"
+            autocomplete="off"
+          )
             .new-publication__header
               h1 Новая публикация
               .new-publication__date-form
@@ -34,7 +39,6 @@ block content
                       name='title'
                       placeholder='Заголовок'
                       value=`${formFieldsData && formFieldsData.title ? formFieldsData.title : ''}`
-                      required=''
                     )
                 if errors && errors.errorByField.title
                   p.form__error-message= errors.errorByField.title.msg
@@ -53,22 +57,23 @@ block content
                 if errors && errors.errorByField.picture
                   p.form__error-message= errors.errorByField.picture.msg
                 .form__field-categories(style=`
-                      display: flex;flex-wrap: wrap;
+                      display: flex;
+                      flex-wrap: wrap;
                       padding: 30px 0 0;
                       justify-content: flex-start;
                       align-items: center;`
                     )
-                  each category, index in categories
+                  each category in categories
                     .new-publication__checkbox.new-publication__checkbox--auto
                       input(
                         type='checkbox'
-                        id=`category-list-${index}`
-                        name='category'
-                        value=category
-                        checked=(formFieldsData && formFieldsData.category ? formFieldsData.category.includes(category) : false)
+                        id=`category-list-${category.id}`
+                        name='categories'
+                        value=category.id
+                        checked=(formFieldsData && formFieldsData.categories ? formFieldsData.categories.includes(String(category.id)) : false)
                       )
-                      label(for=`category-list-${index}`)= category
-                  a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
+                      label(for=`category-list-${category.id}`)= category.title
+                  a.new-publication__form-link.button.button--transparent(href='/categories') Добавить категорию
               if errors && errors.errorByField.category
                   p.form__error-message= errors.errorByField.category.msg
               .form__wrapper.form__wrapper--text

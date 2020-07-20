@@ -2,8 +2,8 @@
 
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
+const {connectDB} = require(`../db-config/db`);
 const {getLogger} = require(`../logger`);
-const {getMockData} = require(`../lib/get-mock-data`);
 
 const {
   API_PREFIX,
@@ -26,7 +26,7 @@ const {
 const getServer = async () => {
   const server = express();
   const logger = getLogger();
-  const mockData = await getMockData();
+  await connectDB();
 
   server.disable(`x-powered-by`);
   server.use(expressPinoLogger(logger));
@@ -39,20 +39,20 @@ const getServer = async () => {
 
   server.use(
       `${API_PREFIX}/categories`,
-      getCategoryRouter(new CategoryService(mockData))
+      getCategoryRouter(new CategoryService())
   );
 
   server.use(
       `${API_PREFIX}/articles`,
       getArticlesRouter(
-          new ArticleService(mockData),
+          new ArticleService(),
           new CommentService()
       )
   );
 
   server.use(
       `${API_PREFIX}/search`,
-      getSearchRouter(new SearchService(mockData))
+      getSearchRouter(new SearchService())
   );
 
   server.use((req, res) => {

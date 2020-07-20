@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {getMostDiscussedArticles} = require(`../../utils`);
+const {truncateText} = require(`../../utils`);
 
 const getMainRouter = (service) => {
 
@@ -9,13 +9,16 @@ const getMainRouter = (service) => {
 
   mainRouter.get(`/`, async (req, res, next) => {
     try {
-      const articles = await service.getAllArticles();
-      const categories = await service.getAllCategories();
+      const {articles, mostDiscussedArticles} = await service.getAllArticles();
+      const categories = await service.getAllCategoriesWithArticlesCount();
+      const lastComments = await service.getLastArticlesComments();
 
       return res.render(`main`, {
-        articles: articles.slice(0, 8),
+        articles,
         categories,
-        mostDiscussedArticles: getMostDiscussedArticles(articles)
+        mostDiscussedArticles,
+        lastComments,
+        truncateText
       });
     } catch (err) {
       return next(err);
@@ -34,10 +37,10 @@ const getMainRouter = (service) => {
         return res.render(`search`);
       }
 
-      const searchResult = await service.searchArticles(query);
+      const articles = await service.searchArticles(query);
 
       return res.render(`search`, {
-        articles: searchResult,
+        articles,
         query
       });
     } catch (err) {

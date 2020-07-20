@@ -48,12 +48,6 @@ const readContentJSON = async (filePath) => {
   }
 };
 
-const getMostDiscussedArticles = (articles) => {
-  return articles.filter((article) => article.comments.length > 0)
-                .sort((a, b) => b.comments.length - a.comments.length)
-                .slice(0, 4);
-};
-
 const convertDate = (dateToCheck) => {
   const date = moment(dateToCheck, `DD.MM.YYYY`);
 
@@ -67,19 +61,35 @@ const convertDate = (dateToCheck) => {
 const copyObject = (obj) => JSON.parse(JSON.stringify(obj));
 
 const formatArticleDate = (articleData) => {
-
   const DATE_FORMAT = `DD.MM.YYYY, HH:mm`;
+  const newArticleData = copyObject(articleData);
   const makeDateFormat = (date) => moment(date).format(DATE_FORMAT);
+  const makeCommentDateFormat = (comments) => {
+    return comments.map((comment) => {
+      comment.createdDate = makeDateFormat(comment.createdDate);
+      return comment;
+    });
+  };
+
+  console.log(newArticleData);
 
   if (Array.isArray(articleData)) {
-    const newArticleList = copyObject(articleData);
-    return newArticleList.map((article) => {
+    return newArticleData.map((article) => {
       article.createdDate = makeDateFormat(article.createdDate);
+
+      if (article.comments && article.comments.length > 0) {
+        article.comments = makeCommentDateFormat(article.comments);
+      }
+
       return article;
     });
   }
 
-  return {...articleData, createdDate: makeDateFormat(articleData.createdDate)};
+  return {
+    ...newArticleData,
+    createdDate: makeDateFormat(newArticleData.createdDate),
+    comments: newArticleData.comments ? makeCommentDateFormat(newArticleData.comments) : []
+  };
 };
 
 const highlightArticleTitle = (articles, searchedText) => {
@@ -100,14 +110,18 @@ const highlightArticleTitle = (articles, searchedText) => {
   });
 };
 
+const truncateText = (text, symbolCount) => {
+  return text.length > symbolCount ? `${text.slice(0, symbolCount)}...` : text;
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
   generateRandomDate,
   readContent,
   readContentJSON,
-  getMostDiscussedArticles,
   convertDate,
   formatArticleDate,
-  highlightArticleTitle
+  highlightArticleTitle,
+  truncateText
 };

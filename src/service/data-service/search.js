@@ -1,14 +1,21 @@
 'use strict';
 
-class SearchService {
-  constructor(articles) {
-    this._articles = articles;
-  }
+const {sequelize} = require(`../db-config/db`);
+const {Article} = sequelize.models;
+const {Op} = require(`sequelize`);
 
-  findAll(text) {
-    return this._articles.filter((article) => {
-      return article.title.toLowerCase().includes(text.toLowerCase());
+class SearchService {
+
+  async findAll(text) {
+    const articles = Article.findAll({
+      where: {
+        title: {
+          [Op.iLike]: `%${text}%`
+        }
+      }
     });
+
+    return articles;
   }
 }
 

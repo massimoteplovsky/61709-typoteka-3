@@ -1,9 +1,12 @@
-mixin categories(categoriesList)
+mixin categories(categories)
 
   section.main-page__theme-list
       h2.visually-hidden Список тем
       ul.themes
-        each category in categoriesList
+        each category in categories
           li.themes__item
-            a.themes__item-link(href='/categories')= `${category} `
-              sup= `${Math.floor(Math.random() * 100)}`
+            a(
+              class=`themes__item-link ${activeCategory && activeCategory.id === category.id ? `themes__item-link--active` : ``}`
+              href=`/articles/category/${category.id}`
+            )= `${category.title} `
+              sup= category.articlesCount

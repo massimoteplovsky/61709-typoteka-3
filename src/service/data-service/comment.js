@@ -1,39 +1,37 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../constants`);
+const {sequelize} = require(`../db-config/db`);
+const {Comment} = sequelize.models;
+const LAST_COMMENTS_LIMIT = 4;
 
 class CommentService {
 
-  create(article, commentData) {
-    const newComment = Object.assign(
-        {
-          id: nanoid(MAX_ID_LENGTH)
-        },
-        commentData
-    );
-
-    article.comments.push(newComment);
+  async createComment(articleId, commentData) {
+    const newComment = await Comment.create(commentData, {returning: true});
 
     return newComment;
   }
 
-  delete(commentId, article) {
-    const deletedComment = article.comments.find((comment) => comment.id === commentId);
-
-    if (!deletedComment) {
-      return null;
-    }
-
-    article.comments = article.comments.filter((comment) => comment.id !== commentId);
-    return deletedComment;
+  async findOne(commentId) {
+    return await Comment.findByPk(commentId, {returning: true});
   }
 
-  findAll(article) {
-    return article.comments;
+  async deleteComment(commentId) {
+    return await Comment.destroy({
+      where: {id: commentId},
+      returning: true
+    });
   }
 
+  async findAll() {
+    const comments = await Comment.findAll({
+      include: [`users`],
+      order: [[`createdDate`, `DESC`]],
+      limit: LAST_COMMENTS_LIMIT
+    });
+
+    return comments;
+  }
 }
-
 
 module.exports = CommentService;

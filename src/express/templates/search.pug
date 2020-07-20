@@ -15,8 +15,8 @@ block content
             if articles.length
               each article in articles
                 .search__result
-                  time.search__date(datetime='2019-03-21T20:33')= article.createdDate
-                  a.search__link !{article.title}
+                  time.search__date(datetime=article.createdDate)= article.createdDate
+                  a.search__link(href=`/articles/${article.id}`) !{article.title}
             else
               p.search-page__empty Ничего не нашлось
 

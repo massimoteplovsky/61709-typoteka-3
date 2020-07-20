@@ -22,7 +22,7 @@ const newArticleFormFieldsRules = [
       return dateRegex.test(value);
     })
     .withMessage(`Неверный формат даты`),
-  check(`category`, `Выберите минимум одну категорию для публикации`)
+  check(`categories`, `Выберите минимум одну категорию для публикации`)
     .exists()
     .bail()
     .toArray()
@@ -40,4 +40,33 @@ const newArticleFormFieldsRules = [
   check(`fullText`, `Полный текст должен содержать максимум 1000 символов`).trim().isLength({max: 1000})
 ];
 
-module.exports = {newArticleFormFieldsRules};
+const newCategoryFormFieldsRules = [
+  check(`title`)
+  .trim()
+    .notEmpty()
+    .withMessage(`Введите название категории`)
+    .bail()
+    .isLength({
+      min: 5,
+      max: 30
+    })
+    .withMessage(`Название категории должно содержать от 5 до 30 символов`),
+];
+
+const newCommentFormFieldsRules = [
+  check(`text`)
+  .trim()
+    .notEmpty()
+    .withMessage(`Введите текст комментария`)
+    .bail()
+    .isLength({
+      min: 20
+    })
+    .withMessage(`Текст комментария должен содержать минимум 20 символов`)
+];
+
+module.exports = {
+  newArticleFormFieldsRules,
+  newCategoryFormFieldsRules,
+  newCommentFormFieldsRules
+};

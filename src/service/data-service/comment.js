@@ -18,8 +18,7 @@ class CommentService {
 
   async deleteComment(commentId) {
     return await Comment.destroy({
-      where: {id: commentId},
-      returning: true
+      where: {id: commentId}
     });
   }
 

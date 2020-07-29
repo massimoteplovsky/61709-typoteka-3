@@ -46,7 +46,8 @@ const getServer = async () => {
       `${API_PREFIX}/articles`,
       getArticlesRouter(
           new ArticleService(),
-          new CommentService()
+          new CommentService(),
+          new CategoryService()
       )
   );
 

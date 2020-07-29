@@ -71,8 +71,6 @@ const formatArticleDate = (articleData) => {
     });
   };
 
-  console.log(newArticleData);
-
   if (Array.isArray(articleData)) {
     return newArticleData.map((article) => {
       article.createdDate = makeDateFormat(article.createdDate);

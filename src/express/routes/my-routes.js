@@ -17,8 +17,8 @@ const getMyRouter = (service) => {
 
   myRouter.get(`/comments`, async (req, res, next) => {
     try {
-      const userArticleComments = await service.getUserArticleComments(1);
-      return res.render(`comments`, {articles: userArticleComments});
+      const userArticlesWithComments = await service.getUserArticleComments(1);
+      return res.render(`comments`, {userArticlesWithComments});
     } catch (err) {
       return next(err);
     }

@@ -1,6 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
+const categoryValidator = require(`../middlewares/category-validator`);
 const {HttpCode} = require(`../../constants`);
 
 const getCategoryRouter = (categoryService) => {
@@ -35,21 +36,21 @@ const getCategoryRouter = (categoryService) => {
     return res.status(HttpCode.SUCCESS).json(deletedCategory);
   });
 
-  categoryRouter.post(`/`, async (req, res) => {
+  categoryRouter.post(`/`, categoryValidator, async (req, res) => {
     const categoryData = req.body;
     const isCategoryExist = await categoryService.findOne(categoryData.title);
 
     if (isCategoryExist) {
-      return res.status(HttpCode.BAD_REQUEST)
+      return res.status(HttpCode.SUCCESS)
       .json({
         error: true,
-        status: HttpCode.BAD_REQUEST,
+        status: HttpCode.SUCCESS,
         message: `Category already exists`
       });
     }
 
     const newCategory = await categoryService.create(categoryData);
-    return res.status(HttpCode.SUCCESS).json(newCategory);
+    return res.status(HttpCode.CREATED).json(newCategory);
   });
 
   categoryRouter.put(`/:categoryId`, async (req, res) => {
@@ -63,6 +64,17 @@ const getCategoryRouter = (categoryService) => {
         error: true,
         status: HttpCode.NOT_FOUND,
         message: `Category is not found`
+      });
+    }
+
+    const isCategoryExist = await categoryService.findOne(categoryData.title);
+
+    if (isCategoryExist) {
+      return res.status(HttpCode.SUCCESS)
+      .json({
+        error: true,
+        status: HttpCode.SUCCESS,
+        message: `Category already exists`
       });
     }
 

@@ -21,7 +21,7 @@ const getArticlesRouter = (service) => {
   articlesRouter.get(`/category/:id`, async (req, res, next) => {
     try {
       const categoryId = req.params.id;
-      const {activeCategory, articles} = await service.getArticleBycategory(categoryId);
+      const {activeCategory, articles} = await service.getArticleByCategory(categoryId);
       const categories = await service.getAllCategoriesWithArticlesCount();
 
       return res.render(`articles-by-category`, {activeCategory, articles, categories});
@@ -91,8 +91,6 @@ const getArticlesRouter = (service) => {
       const file = req.file;
       let formFieldsData = {...req.body};
 
-      console.log(file);
-
       if (file && (!VALID_MIME_TYPES.includes(file.mimetype) || file.size > MAX_FILE_SIZE)) {
         errors.errorsList.push(fileErrorMsg);
         errors.errorByField.picture = {msg: fileErrorMsg};
@@ -115,8 +113,6 @@ const getArticlesRouter = (service) => {
         userId: 1
       };
 
-      console.log(formFieldsData);
-
       await service.updateArticle(articleId, formFieldsData);
 
       return res.redirect(`/my`);
@@ -130,8 +126,6 @@ const getArticlesRouter = (service) => {
       const articleId = req.params.id;
       const article = await service.getArticleById(articleId);
       const categories = await service.getAllCategories();
-
-      console.log(article);
 
       return res.render(`article-edit`, {article, categories});
     } catch (err) {
@@ -150,7 +144,7 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/:id`, async (req, res, next) => {
+  articlesRouter.post(`/delete/:id`, async (req, res, next) => {
     try {
       const articleId = req.params.id;
       await service.deleteArticle(articleId);
@@ -181,7 +175,7 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/comments/:commentId`, ...newCommentFormFieldsRules, async (req, res, next) => {
+  articlesRouter.post(`/comments/delete/:commentId`, async (req, res, next) => {
     try {
       const {commentId} = req.params;
       await service.deleteComment(commentId);

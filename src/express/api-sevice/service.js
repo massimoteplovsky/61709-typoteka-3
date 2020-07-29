@@ -18,7 +18,7 @@ class ApiService {
     return await this._api.get(`/articles/${articleId}`);
   }
 
-  async getArticleBycategory(categoryId) {
+  async getArticleByCategory(categoryId) {
     return await this._api.get(`/articles/category/${categoryId}`);
   }
 
@@ -64,10 +64,6 @@ class ApiService {
 
   async deleteComment(commentId) {
     return await this._api.delete(`/articles/comments/${commentId}`);
-  }
-
-  async getArticleComments(articleId) {
-    return await this._api.get(`/articles/${articleId}/comments`);
   }
 
   async getLastArticlesComments() {

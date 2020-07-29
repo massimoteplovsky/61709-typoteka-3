@@ -16,7 +16,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.get(`/:categoryId`, async (req, res, next) => {
+  categoriesRouter.post(`/delete/:categoryId`, async (req, res, next) => {
     try {
       const {categoryId} = req.params;
       await service.deleteCategory(categoryId);
@@ -37,7 +37,12 @@ const getCategoriesRouter = (service) => {
         return res.render(`all-categories`, {error, categories, categoryData});
       }
 
-      await service.createNewCategory(categoryData);
+      const createdCategory = await service.createNewCategory(categoryData);
+
+      if (createdCategory.error) {
+        error.title = {msg: `Категория уже существует`};
+        return res.render(`all-categories`, {error, categories, categoryData});
+      }
 
       return res.redirect(`/categories`);
     } catch (err) {
@@ -52,11 +57,19 @@ const getCategoriesRouter = (service) => {
       const categories = await service.getAllCategories();
       let categoryData = {...req.body};
 
+
+
       if (Object.keys(error).length > 0) {
         return res.render(`all-categories`, {error, categories, categoryData, categoryId});
       }
 
-      await service.updateCategory(categoryId, categoryData);
+      const updatedCategory = await service.updateCategory(categoryId, categoryData);
+
+      if (updatedCategory.error) {
+        error.title = {msg: `Категория уже существует`};
+        console.log(error);
+        return res.render(`all-categories`, {error, categories, categoryData, categoryId});
+      }
 
       return res.redirect(`/categories`);
     } catch (err) {

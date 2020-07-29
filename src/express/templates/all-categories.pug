@@ -25,7 +25,7 @@ block content
               form(
                 action=`/categories/${category.id}`
                 method='POST'
-                style='flex-grow: 1; width: auto'
+                style='flex-grow: 1; width: auto;'
               )
                 input#modify-form-category-1(
                   type='text'
@@ -36,7 +36,7 @@ block content
                   span.visually-hidden Редактировать категорию
                 button.category__button.button.button--category(type='submit') Сохранить
               if Number(category.articlesCount) === 0
-                form(action=`/categories/${category.id}` method="GET")
+                form(action=`/categories/delete/${category.id}` method="POST")
                   button.category__button.button.button--category(type='submit') Удалить
-              if error && categoryId && category.id === Number(categoryId)
-                p.form__error-message(style=`padding-left: 5px;`)= error.title.msg
+            if error && categoryId && category.id === Number(categoryId)
+              p.form__error-message(style=`padding: 0 37px;`)= error.title.msg

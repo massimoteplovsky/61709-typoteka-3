@@ -2,7 +2,6 @@
 
 const {sequelize} = require(`../db-config/db`);
 const {Article, Comment, articlesCategories, Category} = sequelize.models;
-console.log(sequelize.models);
 const POPULAR_ARTICLES_LIMIT = 4;
 const ARTICLES_LIMIT = 8;
 

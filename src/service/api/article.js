@@ -7,7 +7,7 @@ const articleValidator = require(`../middlewares/article-validator`);
 const commentValidator = require(`../middlewares/comment-validator`);
 const {formatArticleDate, convertDate} = require(`../../utils`);
 
-const getArticlesRouter = (articleService, commentService) => {
+const getArticlesRouter = (articleService, commentService, categoryService) => {
 
   const articlesRouter = new Router();
 
@@ -57,9 +57,9 @@ const getArticlesRouter = (articleService, commentService) => {
 
   articlesRouter.get(`/category/:categoryId`, async (req, res) => {
     const {categoryId} = req.params;
-    const {category, articles} = await articleService.findArticlesByCategory(categoryId);
+    const isCategoryExist = await categoryService.findCategoryById(categoryId);
 
-    if (!category) {
+    if (!isCategoryExist) {
       return res.status(HttpCode.NOT_FOUND)
       .json({
         error: true,
@@ -67,6 +67,8 @@ const getArticlesRouter = (articleService, commentService) => {
         message: `Category with id: ${categoryId} not found`
       });
     }
+
+    const {category, articles} = await articleService.findArticlesByCategory(categoryId);
 
     return res.status(HttpCode.SUCCESS).json({
       activeCategory: category,
@@ -114,23 +116,6 @@ const getArticlesRouter = (articleService, commentService) => {
     const userArticles = await articleService.findAllByUser(userId);
 
     return res.status(HttpCode.SUCCESS).json(formatArticleDate(userArticles));
-  });
-
-  articlesRouter.get(`/:articleId/comments`, async (req, res) => {
-    const {articleId} = req.params;
-    const article = articleService.findOne(articleId);
-
-    if (!article) {
-      return res.status(HttpCode.NOT_FOUND)
-      .json({
-        error: true,
-        status: HttpCode.NOT_FOUND,
-        message: `Article with id: ${articleId} not found`
-      });
-    }
-
-    const comments = await commentService.findAll(article);
-    return res.status(HttpCode.SUCCESS).json(comments);
   });
 
   articlesRouter.post(`/:articleId/comments`, commentValidator, async (req, res) => {

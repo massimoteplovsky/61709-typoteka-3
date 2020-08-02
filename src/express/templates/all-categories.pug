@@ -36,7 +36,7 @@ block content
                   span.visually-hidden Редактировать категорию
                 button.category__button.button.button--category(type='submit') Сохранить
               if Number(category.articlesCount) === 0
-                form(action=`/categories/delete/${category.id}` method="POST")
+                form(action=`/categories/${category.id}/delete` method="POST")
                   button.category__button.button.button--category(type='submit') Удалить
             if error && categoryId && category.id === Number(categoryId)
               p.form__error-message(style=`padding: 0 37px;`)= error.title.msg

@@ -4,17 +4,6 @@ const request = require(`supertest`);
 const {getServer} = require(`../api-server`);
 const {sequelize} = require(`../db-config/db`);
 const {HttpCode} = require(`../../constants`);
-const {formatArticleDate} = require(`../../utils`);
-
-const newArticleData = {
-  title: `Новинки музыки`,
-  announce: `Простые ежедневные упражнения помогут достичь успеха.`,
-  fullText: `Тяжело найти качественную музыку`,
-  createdDate: `2020-06-17`,
-  categories: [1],
-  picture: `picture.png`,
-  userId: 1
-};
 
 const incorrectArticleData = {
   announce: `Простые ежедневные упражнения помогут достичь успеха.`,
@@ -23,15 +12,6 @@ const incorrectArticleData = {
   category: [`Музыка`],
   picture: `picture.png`,
   comments: []
-};
-
-const updatedArticleData = {
-  title: `Новинки музыки`,
-  announce: `Простые ежедневные упражнения помогут достичь успеха.`,
-  fullText: `Тяжело найти хороший б/у автомобиль`,
-  createdDate: `2020-04-17 20:25`,
-  categories: [1],
-  picture: ``
 };
 
 const getArticleWithId = async () => {
@@ -44,9 +24,39 @@ const getArticleWithId = async () => {
 };
 
 let server;
+let newArticleData;
+let updatedArticleData;
 
 beforeAll(async () => {
   server = await getServer();
+  const testingCategoryData = await request(server).post(`/api/categories`).send({title: `Тестовая категория ${Date.now()}`});
+  const testingUserData = await request(server).post(`/api/users`).send({
+    firstname: `Тестовый`,
+    lastname: `Юзер`,
+    email: `useremail${Date.now()}@mail.ru`,
+    password: `12345678`,
+    avatar: `avatar.jpg`
+  });
+
+  newArticleData = {
+    title: `Новинки музыки`,
+    announce: `Простые ежедневные упражнения помогут достичь успеха.`,
+    fullText: `Тяжело найти качественную музыку`,
+    createdDate: `2020-06-17`,
+    categories: [testingCategoryData.body.id],
+    picture: `picture.png`,
+    userId: testingUserData.body.id
+  };
+
+  updatedArticleData = {
+    title: `Новинки музыки`,
+    announce: `Простые ежедневные упражнения помогут достичь успеха.`,
+    fullText: `Тяжело найти хороший б/у автомобиль`,
+    createdDate: `2020-04-17 20:25`,
+    categories: [testingCategoryData.body.id],
+    picture: ``
+  };
+
 });
 
 afterAll(async (done) => {
@@ -55,6 +65,24 @@ afterAll(async (done) => {
 });
 
 describe(`Articles API end-to-end tests`, () => {
+
+  describe(`Create a new article tests`, () => {
+
+    test(`Must create a new article and return it with status code 201`, async () => {
+      const res = await request(server).post(`/api/articles`).send(newArticleData);
+
+      expect(res.statusCode).toBe(HttpCode.CREATED);
+      expect(typeof res.body).toBe(`object`);
+    });
+
+    test(`Invalid article data sent. Request must end with status code 400 (incorrect article data)`, async () => {
+      const res = await request(server).post(`/api/articles`).send(incorrectArticleData);
+
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.status).toBe(HttpCode.BAD_REQUEST);
+    });
+  });
 
   describe(`Get all articles tests`, () => {
 
@@ -102,30 +130,12 @@ describe(`Articles API end-to-end tests`, () => {
     });
 
     test(`Get articles by category with status code 404 (category not found)`, async () => {
-      const categoryId = `9999`;
+      const categoryId = 99999;
       const res = await request(server).get(`/api/articles/category/${categoryId}`);
 
       expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
       expect(res.body.error).toBeTruthy();
       expect(res.body.status).toBe(HttpCode.NOT_FOUND);
-    });
-  });
-
-  describe(`Create a new article tests`, () => {
-
-    test(`Must create a new article and return it with status code 201`, async () => {
-      const res = await request(server).post(`/api/articles`).send(newArticleData);
-
-      expect(res.statusCode).toBe(HttpCode.CREATED);
-      expect(typeof res.body).toBe(`object`);
-    });
-
-    test(`Invalid article data sent. Request must end with status code 400 (incorrect article data)`, async () => {
-      const res = await request(server).post(`/api/articles`).send(incorrectArticleData);
-
-      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
-      expect(res.body.error).toBeTruthy();
-      expect(res.body.status).toBe(HttpCode.BAD_REQUEST);
     });
   });
 
@@ -185,7 +195,8 @@ describe(`Articles API end-to-end tests`, () => {
       const {articleId} = await getArticleWithId();
       const commentData = {
         text: `New test comment`,
-        articleId
+        articleId,
+        userId: 1
       };
       const res = await request(server).post(`/api/articles/${articleId}/comments`).send(commentData);
       const returnedComment = {

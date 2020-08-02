@@ -11,7 +11,7 @@ block content
             li.notes__list-item
               time.notes__item-time(datetime=article.createdDate)= article.createdDate
               a.notes__item-text(href=`/articles/edit/${article.id}`)= article.title
-              form(action=`/articles/delete/${article.id}` method='POST')
+              form(action=`/articles/${article.id}/delete` method='POST')
                 button.notes__button.button.button--close-item(type='submit')
                   span.visually-hidden Закрыть строку списка
       else

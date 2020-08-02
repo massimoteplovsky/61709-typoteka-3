@@ -144,7 +144,7 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/delete/:id`, async (req, res, next) => {
+  articlesRouter.post(`/:id/delete`, async (req, res, next) => {
     try {
       const articleId = req.params.id;
       await service.deleteArticle(articleId);
@@ -175,7 +175,7 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/comments/delete/:commentId`, async (req, res, next) => {
+  articlesRouter.post(`/comments/:commentId/delete`, async (req, res, next) => {
     try {
       const {commentId} = req.params;
       await service.deleteComment(commentId);

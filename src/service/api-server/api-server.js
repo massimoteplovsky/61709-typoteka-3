@@ -13,14 +13,16 @@ const {
 const {
   getCategoryRouter,
   getArticlesRouter,
-  getSearchRouter
+  getSearchRouter,
+  getUserRouter
 } = require(`../api`);
 
 const {
   CategoryService,
   ArticleService,
   SearchService,
-  CommentService
+  CommentService,
+  UserService
 } = require(`../data-service`);
 
 const getServer = async () => {
@@ -40,6 +42,11 @@ const getServer = async () => {
   server.use(
       `${API_PREFIX}/categories`,
       getCategoryRouter(new CategoryService())
+  );
+
+  server.use(
+      `${API_PREFIX}/users`,
+      getUserRouter(new UserService())
   );
 
   server.use(

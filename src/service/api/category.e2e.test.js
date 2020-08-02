@@ -45,8 +45,6 @@ describe(`Categories API end-to-end tests`, () => {
     test(`Create a new category with status code 201`, async () => {
       const res = await request(server).post(`/api/categories`).send({title: `Тестовая категория ${Date.now()}`});
 
-      console.log(res.body);
-
       expect(res.statusCode).toBe(HttpCode.CREATED);
       expect(typeof res.body).toBe(`object`);
     });
@@ -107,7 +105,6 @@ describe(`Categories API end-to-end tests`, () => {
       const res = await request(server).delete(`/api/categories/${category.id}`);
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
-      expect(typeof res.body).toBe(`object`);
     });
 
     test(`Delete category with wrong id with status code 404 (category not found)`, async () => {

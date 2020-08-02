@@ -74,6 +74,10 @@ class ApiService {
     return await this._api.get(`/articles/users/${userId}/comments`);
   }
 
+  async createUser(userData) {
+    return await this._api.post(`/users`, userData);
+  }
+
 }
 
 module.exports = ApiService;

@@ -33,7 +33,7 @@
     "test::rest": "jest",
     "eslint": "eslint --ext .js src/",
     "start": "node ./src/service/service.js",
-    "server": "cross-env LOG_LEVEL=error nodemon ./src/service/service.js --server 3000 | pino-pretty > ./src/service/logs/app.log",
+    "server": "cross-env LOG_LEVEL=error nodemon ./src/service/service.js --server 3000",
     "server::debug": "cross-env LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | pino-pretty > ./src/service/logs/app.log",
     "start-front-server": "nodemon ./src/express/index.js",
     "start-app": "concurrently \"npm run start-front-server\" \"npm run server\"",

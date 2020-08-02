@@ -37,7 +37,7 @@ Object.values(models)
   .forEach((model) => model.associate(models));
 
 const initDB = async () => {
-  await sequelize.sync();
+  await sequelize.sync({force: true});
   console.info(`DB structure has been created`);
 };
 

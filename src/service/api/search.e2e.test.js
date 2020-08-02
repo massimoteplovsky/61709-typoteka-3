@@ -18,6 +18,24 @@ let server;
 
 beforeAll(async () => {
   server = await getServer();
+  const testingCategoryData = await request(server).post(`/api/categories`).send({title: `Тестовая категория ${Date.now()}`});
+  const testingUserData = await request(server).post(`/api/users`).send({
+    firstname: `Тестовый`,
+    lastname: `Юзер`,
+    email: `useremail${Date.now()}@mail.ru`,
+    password: `12345678`,
+    avatar: `avatar.jpg`
+  });
+
+  await request(server).post(`/api/articles`).send({
+    title: `Новинки музыки`,
+    announce: `Простые ежедневные упражнения помогут достичь успеха.`,
+    fullText: `Тяжело найти качественную музыку`,
+    createdDate: `2020-06-17`,
+    categories: [testingCategoryData.body.id],
+    picture: `picture.png`,
+    userId: testingUserData.body.id
+  });
 });
 
 afterAll(async (done) => {

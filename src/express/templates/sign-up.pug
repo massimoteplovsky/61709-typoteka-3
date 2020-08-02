@@ -4,7 +4,7 @@ block content
 
   main
     h1.visually-hidden Регистрация пользователя
-    section.modal
+    section.modal(style=`overflow: auto;`)
       .popup.popup--registration
         button.popup__button.button.button--popup-close(type='button', aria-label='Закрыть окно' onclick='history.back()')
           | Закрыть
@@ -16,29 +16,77 @@ block content
           li.popup__tab.popup__tab--log-in
             button.popup__tab-switcher.button(type='button') Войти
         .popup__form.popup__form--active.form.form--register
-          form(action='#', method='get')
+          form(
+              action='/register'
+              method='POST'
+              enctype="multipart/form-data"
+              autocomplete="off"
+            )
             .form__field
               label
-                input(type='email', placeholder='Электронная почта', required='')
+                input(
+                  type='email'
+                  name='email'
+                  placeholder='Электронная почта'
+                  value= userData && userData.email ? userData.email : ``
+                )
+            if errors && errors.errorByField.email
+              p.form__error-message= errors.errorByField.email.msg
             .form__field
               label
-                input(type='text', placeholder='Имя', required='')
+                input(
+                  type='text'
+                  name='firstname'
+                  placeholder='Имя'
+                  value= userData && userData.firstname ? userData.firstname : ``
+                )
+            if errors && errors.errorByField.firstname
+              p.form__error-message= errors.errorByField.firstname.msg
             .form__field
               label
-                input(type='text', placeholder='Фамилия')
+                input(
+                  type='text'
+                  name='lastname'
+                  placeholder='Фамилия'
+                  value= userData && userData.lastname ? userData.lastname : ``
+                )
+            if errors && errors.errorByField.lastname
+              p.form__error-message= errors.errorByField.lastname.msg
             .form__field
               label
-                input(type='password', placeholder='Пароль', required='')
+                input(
+                  type='password'
+                  name='password'
+                  placeholder='Пароль'
+                  value= userData && userData.password ? userData.password : ``
+                )
+            if errors && errors.errorByField.password
+              p.form__error-message= errors.errorByField.password.msg
             .form__field
               label
-                input(type='password', placeholder='Повтор пароля', required='')
+                input(
+                  type='password'
+                  name='confirm_password'
+                  placeholder='Повтор пароля'
+                  value= userData && userData.confirm_password ? userData.confirm_password : ``
+                )
+            if errors && errors.errorByField.confirm_password
+              p.form__error-message= errors.errorByField.confirm_password.msg
             .form__image-loader
-              a.form__avatar.avatar
-                img(src='img/icons/smile.svg', alt='аватар пользователя')
+              span.form__avatar.avatar
+                img(src=`img/icons/smile.svg` alt='аватар пользователя')
               label
-                input.visually-hidden(type='file')
+                input.visually-hidden(type='file' name='avatar')
                 | Загрузить фото профиля
+            if errors && errors.errorByField.avatar
+              p.form__error-message= errors.errorByField.avatar.msg
             button.form__submit-btn.form__submit-btn--register.button.button--colored(type='submit') Зарегистрироваться
+          if errors && errors.errorsList.length > 0
+            .form__validation-error
+              p.form__error-message При создании публикации произошли ошибки:
+              ul.form__errors
+                each error in errors.errorsList
+                  li.form__error= error
         .popup__form.popup__form--hidden.form.form--log-in
           form(action='#', method='get')
             .form__field

@@ -57,8 +57,6 @@ const getCategoriesRouter = (service) => {
       const categories = await service.getAllCategories();
       let categoryData = {...req.body};
 
-
-
       if (Object.keys(error).length > 0) {
         return res.render(`all-categories`, {error, categories, categoryData, categoryId});
       }

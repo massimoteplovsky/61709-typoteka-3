@@ -8,7 +8,7 @@ const getMyRouter = (service) => {
 
   myRouter.get(`/`, async (req, res, next) => {
     try {
-      const articles = await service.getAllArticles();
+      const articles = await service.getAllArticlesByUser(1);
       return res.render(`my`, {articles});
     } catch (err) {
       return next(err);
@@ -17,12 +17,8 @@ const getMyRouter = (service) => {
 
   myRouter.get(`/comments`, async (req, res, next) => {
     try {
-      const articles = await service.getAllArticles();
-      const articleComments = await Promise.all(
-          articles.slice(0, 3)
-          .map((article) => service.getArticleComments(article.id))
-      );
-      return res.render(`comments`, {comments: articleComments.flat()});
+      const userArticlesWithComments = await service.getUserArticleComments(1);
+      return res.render(`comments`, {userArticlesWithComments});
     } catch (err) {
       return next(err);
     }

@@ -2,9 +2,8 @@
 
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
+const {connectDB} = require(`../db-config/db`);
 const {getLogger} = require(`../logger`);
-const {connectDB} = require(`../db-connect`);
-const {getMockData} = require(`../lib/get-mock-data`);
 
 const {
   API_PREFIX,
@@ -14,20 +13,21 @@ const {
 const {
   getCategoryRouter,
   getArticlesRouter,
-  getSearchRouter
+  getSearchRouter,
+  getUserRouter
 } = require(`../api`);
 
 const {
   CategoryService,
   ArticleService,
   SearchService,
-  CommentService
+  CommentService,
+  UserService
 } = require(`../data-service`);
 
 const getServer = async () => {
   const server = express();
   const logger = getLogger();
-  const mockData = await getMockData();
 
   await connectDB();
 
@@ -42,20 +42,26 @@ const getServer = async () => {
 
   server.use(
       `${API_PREFIX}/categories`,
-      getCategoryRouter(new CategoryService(mockData))
+      getCategoryRouter(new CategoryService())
+  );
+
+  server.use(
+      `${API_PREFIX}/users`,
+      getUserRouter(new UserService())
   );
 
   server.use(
       `${API_PREFIX}/articles`,
       getArticlesRouter(
-          new ArticleService(mockData),
-          new CommentService()
+          new ArticleService(),
+          new CommentService(),
+          new CategoryService()
       )
   );
 
   server.use(
       `${API_PREFIX}/search`,
-      getSearchRouter(new SearchService(mockData))
+      getSearchRouter(new SearchService())
   );
 
   server.use((req, res) => {

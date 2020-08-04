@@ -11,7 +11,7 @@ const getSearchRouter = (searchService) => {
 
   const searchRouter = new Router();
 
-  searchRouter.get(`/`, (req, res) => {
+  searchRouter.get(`/`, async (req, res) => {
     const {query} = req.query;
 
     if (typeof (query) === `undefined`) {
@@ -23,7 +23,7 @@ const getSearchRouter = (searchService) => {
       });
     }
 
-    const searchedArticles = searchService.findAll(query);
+    const searchedArticles = await searchService.findAll(query);
     return res.status(HttpCode.SUCCESS).json(
         highlightArticleTitle(formatArticleDate(searchedArticles), query)
     );

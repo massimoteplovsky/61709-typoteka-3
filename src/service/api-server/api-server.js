@@ -28,6 +28,7 @@ const {
 const getServer = async () => {
   const server = express();
   const logger = getLogger();
+
   await connectDB();
 
   server.disable(`x-powered-by`);

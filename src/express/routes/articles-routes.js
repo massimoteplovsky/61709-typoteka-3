@@ -20,11 +20,25 @@ const getArticlesRouter = (service) => {
 
   articlesRouter.get(`/category/:id`, async (req, res, next) => {
     try {
+      const activePage = parseInt(req.query.page, 10) || 1;
       const categoryId = req.params.id;
-      const {activeCategory, articles} = await service.getArticleByCategory(categoryId);
+      const {
+        activeCategory,
+        articles,
+        articlesCount,
+        pagesCount
+      } = await service.getArticleByCategory(categoryId, activePage);
       const categories = await service.getAllCategoriesWithArticlesCount();
 
-      return res.render(`articles-by-category`, {activeCategory, articles, categories});
+      return res.render(`articles-by-category`, {
+        activeCategory,
+        articles,
+        categories,
+        activePage,
+        articlesCount,
+        pagesCount,
+        template: `articles-by-category`
+      });
     } catch (err) {
       return next(err);
     }

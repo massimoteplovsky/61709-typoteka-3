@@ -1,22 +1,34 @@
 'use strict';
 
 const {sequelize} = require(`../db-config/db`);
-const {Article, Comment, articlesCategories, Category} = sequelize.models;
+const {
+  Article,
+  Comment,
+  articlesCategories,
+  Category} = sequelize.models;
 const POPULAR_ARTICLES_LIMIT = 4;
 const ARTICLES_LIMIT = 8;
+const countOffset = (limit, activePage) => limit * (activePage - 1);
 
 class ArticleService {
   constructor(articles) {
     this._articles = articles;
   }
 
-  async findAll() {
+  async findAll(activePage) {
+    const offset = countOffset(ARTICLES_LIMIT, activePage);
     const articles = await Article.findAll({
       include: [`categories`, `comments`],
-      limit: ARTICLES_LIMIT
+      limit: ARTICLES_LIMIT,
+      offset
     });
 
-    return articles;
+    const articlesCount = await Article.count();
+
+    return {
+      articles,
+      articlesCount
+    };
   }
 
   async findAllByUser(userId) {
@@ -90,11 +102,21 @@ class ArticleService {
     return article;
   }
 
-  async findArticlesByCategory(categoryId) {
-    const category = await Category.findByPk(categoryId);
-    const articles = await category.getArticles({include: [`categories`, `comments`]});
+  async findArticlesByCategory(categoryId, activePage) {
+    const offset = countOffset(ARTICLES_LIMIT, activePage);
+    const activeCategory = await Category.findByPk(categoryId);
+    const articlesCount = await activeCategory.countArticles();
+    const articles = await activeCategory.getArticles({
+      include: [`categories`, `comments`],
+      limit: ARTICLES_LIMIT,
+      offset
+    });
 
-    return {category, articles};
+    return {
+      activeCategory,
+      articles,
+      articlesCount
+    };
   }
 
   async findAllByUser(userId) {

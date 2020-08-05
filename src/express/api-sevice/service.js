@@ -6,8 +6,8 @@ class ApiService {
     this._api = api;
   }
 
-  async getAllArticles() {
-    return await this._api.get(`/articles`);
+  async getAllArticles(activePage) {
+    return await this._api.get(`/articles`, {params: {activePage}});
   }
 
   async getAllArticlesByUser(userId) {
@@ -18,8 +18,8 @@ class ApiService {
     return await this._api.get(`/articles/${articleId}`);
   }
 
-  async getArticleByCategory(categoryId) {
-    return await this._api.get(`/articles/category/${categoryId}`);
+  async getArticleByCategory(categoryId, activePage) {
+    return await this._api.get(`/articles/category/${categoryId}`, {params: {activePage}});
   }
 
   async deleteArticle(articleId) {

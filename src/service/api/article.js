@@ -6,18 +6,32 @@ const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
 const commentValidator = require(`../middlewares/comment-validator`);
 const {formatArticleDate, convertDate} = require(`../../utils`);
+const ARTICLES_PER_PAGE = 8;
 
 const getArticlesRouter = (articleService, commentService, categoryService) => {
 
   const articlesRouter = new Router();
 
   articlesRouter.get(`/`, async (req, res) => {
-    const articles = await articleService.findAll();
+    const {activePage} = req.query;
+    const {articles, articlesCount} = await articleService.findAll(parseInt(activePage, 10));
     const mostDiscussedArticles = await articleService.findMostDiscussedArticles();
+    const pagesCount = Math.ceil(articlesCount / ARTICLES_PER_PAGE);
+
+    if (activePage > pagesCount) {
+      return res.status(HttpCode.NOT_FOUND)
+        .json({
+          error: true,
+          status: HttpCode.NOT_FOUND,
+          message: `Page ${activePage} not found`
+        });
+    }
 
     return res.status(HttpCode.SUCCESS).json({
       articles: formatArticleDate(articles),
-      mostDiscussedArticles
+      mostDiscussedArticles,
+      articlesCount,
+      pagesCount
     });
   });
 
@@ -56,6 +70,7 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
   });
 
   articlesRouter.get(`/category/:categoryId`, async (req, res) => {
+    const {activePage} = req.query;
     const {categoryId} = req.params;
     const isCategoryExist = await categoryService.findCategoryById(categoryId);
 
@@ -68,11 +83,28 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
       });
     }
 
-    const {category, articles} = await articleService.findArticlesByCategory(categoryId);
+    const {
+      activeCategory,
+      articles,
+      articlesCount
+    } = await articleService.findArticlesByCategory(categoryId, parseInt(activePage, 10));
+
+    const pagesCount = Math.ceil(articlesCount / ARTICLES_PER_PAGE);
+
+    if (activePage > pagesCount) {
+      return res.status(HttpCode.NOT_FOUND)
+        .json({
+          error: true,
+          status: HttpCode.NOT_FOUND,
+          message: `Page ${activePage} not found`
+        });
+    }
 
     return res.status(HttpCode.SUCCESS).json({
-      activeCategory: category,
-      articles: formatArticleDate(articles)
+      activeCategory,
+      articles: formatArticleDate(articles),
+      articlesCount,
+      pagesCount
     });
   });
 

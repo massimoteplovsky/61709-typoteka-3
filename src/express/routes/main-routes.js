@@ -17,7 +17,13 @@ const getMainRouter = (service) => {
 
   mainRouter.get(`/`, async (req, res, next) => {
     try {
-      const {articles, mostDiscussedArticles} = await service.getAllArticles();
+      const activePage = parseInt(req.query.page, 10) || 1;
+      const {
+        articles,
+        mostDiscussedArticles,
+        articlesCount,
+        pagesCount
+      } = await service.getAllArticles(activePage);
       const categories = await service.getAllCategoriesWithArticlesCount();
       const lastComments = await service.getLastArticlesComments();
 
@@ -26,6 +32,10 @@ const getMainRouter = (service) => {
         categories,
         mostDiscussedArticles,
         lastComments,
+        articlesCount,
+        activePage,
+        pagesCount,
+        template: `main`,
         truncateText
       });
     } catch (err) {

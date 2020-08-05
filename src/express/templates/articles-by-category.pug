@@ -1,6 +1,7 @@
 extends layout.pug
 include partials/categories.pug
 include partials/articles-list.pug
+include partials/pagination.pug
 
 block content
 
@@ -19,4 +20,6 @@ block content
       ul.preview__list
         each article in articles
           +articles-list(article)
+    if pagesCount > 1
+        +pagination(pagesCount, activePage, `articles-by-category`, activeCategory)
 

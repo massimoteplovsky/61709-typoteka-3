@@ -1,6 +1,7 @@
 extends layout.pug
 include partials/categories.pug
 include partials/articles-list.pug
+include partials/pagination.pug
 
 block content
 
@@ -41,8 +42,9 @@ block content
             p.hot__empty Здесь пока ничего нет...
       section.main-page__list.preview
         h2.visually-hidden Список превью статей
-
         ul.preview__list
           each article in articles
             +articles-list(article)
+      if pagesCount > 1
+        +pagination(pagesCount, activePage, template, activeCategory)
 

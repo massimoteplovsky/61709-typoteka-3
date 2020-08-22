@@ -37,7 +37,7 @@ block content
                     input(type='text'
                       placeholder='Заголовок'
                       name='title'
-                      value=`${formFieldsData && formFieldsData.title ? formFieldsData.title : article.title}`
+                      value=`${articleFormData ? articleFormData.title : article.title}`
                     )
                 if errors && errors.errorByField.title
                   p.form__error-message= errors.errorByField.title.msg
@@ -45,7 +45,7 @@ block content
                   label
                     input#image-name-field(
                       type='text'
-                      value=`${formFieldsData && formFieldsData.picture ? formFieldsData.picture : article.picture ? article.picture : ``}`
+                      value=`${articleFormData && articleFormData.picture ? articleFormData.picture : article.picture ? article.picture : ``}`
                       placeholder='Фотография'
                       readonly=''
                     )
@@ -70,8 +70,8 @@ block content
                         name='categories'
                         value=category.id
                         checked=(
-                          formFieldsData && formFieldsData.categories ?
-                            formFieldsData.categories.includes(String(category.id))
+                          articleFormData && articleFormData.categories ?
+                            articleFormData.categories.includes(String(category.id))
                             :
                             article.categories.some(({id}) => id === category.id)
                           )
@@ -87,7 +87,7 @@ block content
                       rows='2'
                       name='announce'
                       placeholder='Анонс публикации'
-                    )= formFieldsData && formFieldsData.announce ? formFieldsData.announce : article.announce
+                    )= articleFormData ? articleFormData.announce : article.announce
                 if errors && errors.errorByField.announce
                   p.form__error-message= errors.errorByField.announce.msg
                 .form__field.form__field--publication-text
@@ -96,7 +96,7 @@ block content
                       rows='5'
                       name='fullText'
                       placeholder='Полный текст публикации'
-                    )= formFieldsData && formFieldsData.fullText ? formFieldsData.fullText : article.fullText
+                    )= articleFormData ? articleFormData.fullText : article.fullText
                 if errors && errors.errorByField.fullText
                   p.form__error-message= errors.errorByField.fullText.msg
               if errors && errors.errorsList.length > 0

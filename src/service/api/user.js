@@ -9,7 +9,7 @@ const getUserRouter = (userService) => {
 
   userRouter.get(`/`, async (req, res) => {
     const users = await userService.findAll();
-    return res.status(HttpCode.CREATED).json(users);
+    return res.status(HttpCode.SUCCESS).json(users);
   });
 
   userRouter.post(`/`, userValidator, async (req, res) => {

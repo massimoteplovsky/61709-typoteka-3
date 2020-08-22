@@ -1,11 +1,13 @@
 'use strict';
 
 const {sequelize} = require(`../db-config/db`);
+const {Op} = require(`sequelize`);
 const {
   Article,
   Comment,
   articlesCategories,
-  Category} = sequelize.models;
+  Category
+} = sequelize.models;
 const POPULAR_ARTICLES_LIMIT = 4;
 const ARTICLES_LIMIT = 8;
 const countOffset = (limit, activePage) => limit * (activePage - 1);
@@ -20,6 +22,7 @@ class ArticleService {
     const articles = await Article.findAll({
       include: [`categories`, `comments`],
       limit: ARTICLES_LIMIT,
+      order: [[`createdDate`, `DESC`]],
       offset
     });
 

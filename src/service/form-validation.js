@@ -1,6 +1,12 @@
 'use strict';
 
 const {check} = require(`express-validator`);
+const CategoryService = require(`./data-service/category`);
+
+// const MAX_FILE_SIZE = 15 * 1024 * 1024;
+// const MEGABYTE_IN_BYTES = 1048576;
+
+const categoryService = new CategoryService();
 
 const newArticleFormFieldsRules = [
   check(`title`)
@@ -39,7 +45,13 @@ const newArticleFormFieldsRules = [
       max: 250
     })
     .withMessage(`Анонс должен содержать от 30 до 250 символов`),
-  check(`fullText`, `Полный текст должен содержать максимум 1000 символов`).trim().isLength({max: 1000})
+  check(`fullText`, `Полный текст должен содержать максимум 1000 символов`)
+    .trim()
+    .isLength({max: 1000})
+    .escape()
+  // check(`picture`, `Неверный формат (только jpg/jpeg/png), большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`)
+  //   .trim()
+  //   .notEmpty()
 ];
 
 const newCategoryFormFieldsRules = [
@@ -52,7 +64,17 @@ const newCategoryFormFieldsRules = [
       min: 5,
       max: 30
     })
-    .withMessage(`Название категории должно содержать от 5 до 30 символов`),
+    .withMessage(`Название категории должно содержать от 5 до 30 символов`)
+    .bail()
+    .custom(async (value) => {
+      const isCategoryExist = await categoryService.findOne(value);
+
+      if (isCategoryExist) {
+        throw Error(`Категория уже существует`);
+      }
+
+      return true;
+    })
 ];
 
 const newCommentFormFieldsRules = [
@@ -60,6 +82,7 @@ const newCommentFormFieldsRules = [
   .trim()
     .notEmpty()
     .withMessage(`Введите текст комментария`)
+    .escape()
     .bail()
     .isLength({
       min: 20

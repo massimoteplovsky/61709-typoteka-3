@@ -55,7 +55,8 @@ const getServer = async () => {
       getArticlesRouter(
           new ArticleService(),
           new CommentService(),
-          new CategoryService()
+          new CategoryService(),
+          new UserService()
       )
   );
 

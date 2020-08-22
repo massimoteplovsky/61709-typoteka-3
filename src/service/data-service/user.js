@@ -13,6 +13,10 @@ class UserService {
     return User.findAll();
   }
 
+  async findUserById(userId) {
+    return User.findByPk(userId);
+  }
+
   async findUserByEmail(email) {
     return User.findOne({where: {email}});
   }

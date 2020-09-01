@@ -22,7 +22,7 @@ block content
                     input#new-publication-date(
                       type='text'
                       name='createdDate'
-                      value=`${articleFormData && articleFormData.createdDate ? articleFormData.createdDate : new Date().toISOString()}`
+                      value=`${articleData && articleData.createdDate ? articleData.createdDate : new Date().toISOString()}`
                     )
                 if errors && errors.errorByField.createdDate
                   p.form__error-message= errors.errorByField.createdDate.msg
@@ -38,7 +38,7 @@ block content
                       type='text'
                       name='title'
                       placeholder='Заголовок'
-                      value=`${articleFormData && articleFormData.title ? articleFormData.title : ''}`
+                      value=`${articleData && articleData.title ? articleData.title : ''}`
                     )
                 if errors && errors.errorByField.title
                   p.form__error-message= errors.errorByField.title.msg
@@ -48,7 +48,7 @@ block content
                       type='text'
                       placeholder='Фотография'
                       readonly=''
-                      value=`${articleFormData && articleFormData.picture ? articleFormData.picture : ''}`
+                      value=`${articleData && articleData.picture ? articleData.picture : ''}`
                     )
                   .form__image-loader.form__image-loader--publication
                     label
@@ -70,7 +70,7 @@ block content
                         id=`category-list-${category.id}`
                         name='categories'
                         value=category.id
-                        checked=(articleFormData && articleFormData.categories ? articleFormData.categories.includes(String(category.id)) : false)
+                        checked=(articleData && articleData.categories ? articleData.categories.includes(String(category.id)) : false)
                       )
                       label(for=`category-list-${category.id}`)= category.title
                   a.new-publication__form-link.button.button--transparent(href='/categories') Добавить категорию
@@ -84,7 +84,7 @@ block content
                       name='announce'
                       placeholder='Анонс публикации'
                       required=''
-                    )= `${articleFormData && articleFormData.announce ? articleFormData.announce : ''}`
+                    )= `${articleData && articleData.announce ? articleData.announce : ''}`
                 if errors && errors.errorByField.announce
                   p.form__error-message= errors.errorByField.announce.msg
                 .form__field.form__field--publication-text
@@ -93,7 +93,7 @@ block content
                       rows='1'
                       name='fullText'
                       placeholder='Полный текст публикации'
-                    )= `${articleFormData && articleFormData.fullText ? articleFormData.fullText : ''}`
+                    )= `${articleData && articleData.fullText ? articleData.fullText : ''}`
                 if errors && errors.errorByField.fullText
                   p.form__error-message= errors.errorByField.fullText.msg
               if errors && errors.errorsList.length > 0

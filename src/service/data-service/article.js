@@ -1,7 +1,6 @@
 'use strict';
 
 const {sequelize} = require(`../db-config/db`);
-const {Op} = require(`sequelize`);
 const {
   Article,
   Comment,

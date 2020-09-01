@@ -46,25 +46,22 @@ const getArticlesRouter = (service) => {
   articlesRouter.post(`/add`, upload, async (req, res, next) => {
     try {
       const file = req.file;
-      let formFieldsData = {...req.body};
+      let articleData = {...req.body};
 
-      if (file) {
-        formFieldsData = {
-          ...formFieldsData,
-          picture: file.filename
-        };
-      }
+      articleData = {
+        ...articleData,
+        picture: file ? file.filename : null
+      };
 
-      const newArticleData = await service.createNewArticle(formFieldsData);
+      const articleCreationResult = await service.createNewArticle(articleData);
 
-      if (newArticleData.validationError) {
-        const {errors, categories, articleFormData} = newArticleData;
-        return res.render(`article-new`, {errors, categories, articleFormData});
+      if (articleCreationResult.validationError) {
+        const {errors, categories} = articleCreationResult;
+        return res.render(`article-new`, {errors, categories, articleData});
       }
 
       return res.redirect(`/my`);
     } catch (err) {
-      console.log(err === `invalid`);
       return next(err);
     }
   });
@@ -73,18 +70,23 @@ const getArticlesRouter = (service) => {
     try {
       const {articleId} = req.params;
       const file = req.file;
-      let formFieldsData = {...req.body};
+      let articleData = {...req.body};
 
-      formFieldsData = {
-        ...formFieldsData,
+      articleData = {
+        ...articleData,
         picture: file ? file.filename : null
       };
 
-      const updatedArticleData = await service.updateArticle(articleId, formFieldsData);
+      const articleUpdateResult = await service.updateArticle(articleId, articleData);
 
-      if (updatedArticleData.validationError) {
-        const {errors, article, categories, articleFormData} = updatedArticleData;
-        return res.render(`article-edit`, {errors, article, categories, articleFormData});
+      if (articleUpdateResult.validationError) {
+        const {errors, article, categories} = articleUpdateResult;
+        return res.render(`article-edit`, {
+          errors,
+          article,
+          categories,
+          articleData: {...articleData, categories: articleData.categories ? articleData.categories : []},
+        });
       }
 
       return res.redirect(`/my`);
@@ -132,10 +134,10 @@ const getArticlesRouter = (service) => {
       const articleId = req.params.id;
       const commentData = {...req.body};
 
-      const newCommentData = await service.createComment(articleId, commentData);
+      const commentCreationResult = await service.createComment(articleId, commentData);
 
-      if (newCommentData.validationError) {
-        const {errors, article, commentFormData} = newCommentData;
+      if (commentCreationResult.validationError) {
+        const {errors, article, commentFormData} = commentCreationResult;
         return res.render(`article`, {errors, article, commentFormData});
       }
 

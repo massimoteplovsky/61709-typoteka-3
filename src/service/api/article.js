@@ -121,24 +121,23 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
       errorsList: validateForm(req),
       errorByField: validateFormByFields(req)
     };
-    let articleFormData = {...req.body};
+    let articleData = {...req.body};
 
     if (errors.errorsList.length > 0) {
       const categories = await categoryService.findAll();
       return res.status(HttpCode.BAD_REQUEST).send({
-        articleFormData,
         categories,
         errors
       });
     }
 
-    articleFormData = {
-      ...articleFormData,
-      createdDate: convertDate(articleFormData.createdDate),
+    articleData = {
+      ...articleData,
+      createdDate: convertDate(articleData.createdDate),
       userId: 1
     };
 
-    const newArticle = await articleService.createArticle(articleFormData);
+    const newArticle = await articleService.createArticle(articleData);
     return res.status(HttpCode.CREATED).json(formatArticleDate(newArticle));
   });
 
@@ -148,7 +147,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
       errorsList: validateForm(req),
       errorByField: validateFormByFields(req)
     };
-    let articleFormData = {...req.body};
+    let articleData = {...req.body};
     const article = await articleService.findOne(articleId);
 
     if (!article) {
@@ -165,18 +164,17 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
       return res.status(HttpCode.BAD_REQUEST).send({
         categories,
         article,
-        articleFormData: {...articleFormData, categories: articleFormData.categories ? articleFormData.categories : []},
         errors
       });
     }
 
-    articleFormData = {
-      ...articleFormData,
-      createdDate: convertDate(articleFormData.createdDate),
+    articleData = {
+      ...articleData,
+      createdDate: convertDate(articleData.createdDate),
       userId: 1
     };
 
-    const updatedArticle = await articleService.updateArticle(articleId, articleFormData);
+    const updatedArticle = await articleService.updateArticle(articleId, articleData);
     return res.status(HttpCode.SUCCESS).json(updatedArticle);
   });
 
@@ -255,8 +253,6 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
   articlesRouter.delete(`/comments/:commentId`, checkParamIsInteger, async (req, res) => {
     const {commentId} = req.params;
     const comment = await commentService.findOne(commentId);
-
-    console.log(comment)
 
     if (!comment) {
       return res.status(HttpCode.NOT_FOUND)

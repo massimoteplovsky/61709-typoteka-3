@@ -3,9 +3,6 @@
 const {check} = require(`express-validator`);
 const CategoryService = require(`./data-service/category`);
 
-// const MAX_FILE_SIZE = 15 * 1024 * 1024;
-// const MEGABYTE_IN_BYTES = 1048576;
-
 const categoryService = new CategoryService();
 
 const newArticleFormFieldsRules = [
@@ -49,9 +46,6 @@ const newArticleFormFieldsRules = [
     .trim()
     .isLength({max: 1000})
     .escape()
-  // check(`picture`, `Неверный формат (только jpg/jpeg/png), большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`)
-  //   .trim()
-  //   .notEmpty()
 ];
 
 const newCategoryFormFieldsRules = [

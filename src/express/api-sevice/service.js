@@ -35,12 +35,11 @@ class ApiService {
       const {response} = err;
 
       if (response.status === HttpCode.BAD_REQUEST) {
-        const {data: {errors, categories, articleFormData}} = response;
+        const {data: {errors, categories}} = response;
         return {
           validationError: true,
           errors,
-          categories,
-          articleFormData
+          categories
         };
       }
 
@@ -55,14 +54,13 @@ class ApiService {
       const {response} = err;
 
       if (response.status === HttpCode.BAD_REQUEST) {
-        const {data: {errors, article, categories, articleFormData}} = response;
+        const {data: {errors, article, categories}} = response;
 
         return {
           validationError: true,
           article,
           errors,
-          categories,
-          articleFormData
+          categories
         };
       }
 

@@ -16,16 +16,16 @@ const storageConfig = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   if (VALID_MIME_TYPES.includes(file.mimetype)) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    return cb(null, false);
+    cb(null, false);
   }
 };
 
 const fileUploader = multer({
   storage: storageConfig,
   fileFilter,
-  limits: {fileSize: MAX_FILE_SIZE},
+  limits: {fileSize: MAX_FILE_SIZE}
 });
 
-module.exports = {fileUploader};
+module.exports = {fileUploader, multer};

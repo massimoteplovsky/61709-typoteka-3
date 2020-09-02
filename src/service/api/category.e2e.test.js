@@ -7,9 +7,7 @@ const {HttpCode} = require(`../../constants`);
 
 const getCategory = async () => {
   const categoriesData = await request(server).get(`/api/categories`);
-  const categories = categoriesData.body;
-
-  return categories[0];
+  return categoriesData.body[0];
 };
 
 let server;
@@ -24,7 +22,7 @@ afterAll(async (done) => {
 });
 
 const incorrectCategoryData = {
-  message: `Тестовая категория`
+  title: ``
 };
 
 describe(`Categories API end-to-end tests`, () => {
@@ -43,27 +41,15 @@ describe(`Categories API end-to-end tests`, () => {
   describe(`Create a new category tests`, () => {
 
     test(`Create a new category with status code 201`, async () => {
-      const res = await request(server).post(`/api/categories`).send({title: `Тестовая категория ${Date.now()}`});
-
+      const res = await request(server).post(`/api/categories`).send({title: `Категория ${Date.now()}`});
       expect(res.statusCode).toBe(HttpCode.CREATED);
       expect(typeof res.body).toBe(`object`);
     });
 
-    test(`Create a new category with the same title status code 200`, async () => {
-      const category = await getCategory();
-      const res = await request(server).post(`/api/categories`).send({title: category.title});
-
-      expect(res.statusCode).toBe(HttpCode.SUCCESS);
-      expect(res.body.error).toBe(true);
-      expect(res.body.status).toBe(HttpCode.SUCCESS);
-    });
-
-    test(`Create a new category with status code 400 (incorrect data sent)`, async () => {
+    test(`Create a new category with status code 400 (incorrect or invalid data sent)`, async () => {
       const res = await request(server).post(`/api/categories`).send(incorrectCategoryData);
 
       expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
-      expect(res.body.error).toBe(true);
-      expect(res.body.status).toBe(HttpCode.BAD_REQUEST);
     });
 
   });
@@ -72,7 +58,7 @@ describe(`Categories API end-to-end tests`, () => {
 
     test(`Update category with status code 200`, async () => {
       const category = await getCategory();
-      const res = await request(server).put(`/api/categories/${category.id}`).send({title: `Teстовая категория 2`});
+      const res = await request(server).put(`/api/categories/${category.id}`).send({title: `Категория ${Date.now()}`});
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
       expect(typeof res.body).toBe(`object`);
@@ -82,9 +68,7 @@ describe(`Categories API end-to-end tests`, () => {
       const category = await getCategory();
       const res = await request(server).put(`/api/categories/${category.id}`).send({title: category.title});
 
-      expect(res.statusCode).toBe(HttpCode.SUCCESS);
-      expect(res.body.error).toBe(true);
-      expect(res.body.status).toBe(HttpCode.SUCCESS);
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
     });
 
     test(`Update cetgory with wrong id with status code 404 (category not found)`, async () => {

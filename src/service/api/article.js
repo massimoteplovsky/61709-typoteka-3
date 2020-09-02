@@ -2,13 +2,21 @@
 
 const {Router} = require(`express`);
 const moment = require(`moment`);
+const {
+  newArticleFormFieldsRules,
+  newCommentFormFieldsRules
+} = require(`../form-validation`);
 const {HttpCode} = require(`../../constants`);
-const articleValidator = require(`../middlewares/article-validator`);
-const commentValidator = require(`../middlewares/comment-validator`);
+const {
+  validateForm,
+  validateFormByFields
+} = require(`../../utils`);
+const {checkParamIsInteger} = require(`../middlewares/param-validator`);
 const {formatArticleDate, convertDate} = require(`../../utils`);
 const ARTICLES_PER_PAGE = 8;
 
-const getArticlesRouter = (articleService, commentService, categoryService) => {
+
+const getArticlesRouter = (articleService, commentService, categoryService, userService) => {
 
   const articlesRouter = new Router();
 
@@ -18,7 +26,7 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
     const mostDiscussedArticles = await articleService.findMostDiscussedArticles();
     const pagesCount = Math.ceil(articlesCount / ARTICLES_PER_PAGE);
 
-    if (activePage > pagesCount) {
+    if (activePage > (pagesCount ? pagesCount : 1)) {
       return res.status(HttpCode.NOT_FOUND)
         .json({
           error: true,
@@ -91,7 +99,7 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
 
     const pagesCount = Math.ceil(articlesCount / ARTICLES_PER_PAGE);
 
-    if (activePage > pagesCount) {
+    if (activePage > (pagesCount ? pagesCount : 1)) {
       return res.status(HttpCode.NOT_FOUND)
         .json({
           error: true,
@@ -108,15 +116,38 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
     });
   });
 
-  articlesRouter.post(`/`, articleValidator, async (req, res) => {
-    const articleData = req.body;
+  articlesRouter.post(`/`, ...newArticleFormFieldsRules, async (req, res) => {
+    const errors = {
+      errorsList: validateForm(req),
+      errorByField: validateFormByFields(req)
+    };
+    let articleData = {...req.body};
+
+    if (errors.errorsList.length > 0) {
+      const categories = await categoryService.findAll();
+      return res.status(HttpCode.BAD_REQUEST).send({
+        categories,
+        errors
+      });
+    }
+
+    articleData = {
+      ...articleData,
+      createdDate: convertDate(articleData.createdDate),
+      userId: 1
+    };
+
     const newArticle = await articleService.createArticle(articleData);
     return res.status(HttpCode.CREATED).json(formatArticleDate(newArticle));
   });
 
-  articlesRouter.put(`/:articleId`, articleValidator, async (req, res) => {
+  articlesRouter.put(`/:articleId`, checkParamIsInteger, ...newArticleFormFieldsRules, async (req, res) => {
     const {articleId} = req.params;
-    const articleData = req.body;
+    const errors = {
+      errorsList: validateForm(req),
+      errorByField: validateFormByFields(req)
+    };
+    let articleData = {...req.body};
     const article = await articleService.findOne(articleId);
 
     if (!article) {
@@ -128,12 +159,37 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
       });
     }
 
+    if (errors.errorsList.length > 0) {
+      const categories = await categoryService.findAll();
+      return res.status(HttpCode.BAD_REQUEST).send({
+        categories,
+        article,
+        errors
+      });
+    }
+
+    articleData = {
+      ...articleData,
+      createdDate: convertDate(articleData.createdDate),
+      userId: 1
+    };
+
     const updatedArticle = await articleService.updateArticle(articleId, articleData);
     return res.status(HttpCode.SUCCESS).json(updatedArticle);
   });
 
-  articlesRouter.get(`/users/:userId/comments`, async (req, res) => {
+  articlesRouter.get(`/users/:userId/comments`, checkParamIsInteger, async (req, res) => {
     const {userId} = req.params;
+    const isUserExist = await userService.findUserById(userId);
+
+    if (!isUserExist) {
+      return res.status(HttpCode.NOT_FOUND).json({
+        error: true,
+        status: HttpCode.NOT_FOUND,
+        message: `User with id ${userId} not found`
+      });
+    }
+
     const userArticles = await articleService.findUserArticlesWithComments(userId);
     return res.status(HttpCode.SUCCESS).json(formatArticleDate(userArticles));
   });
@@ -145,15 +201,26 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
 
   articlesRouter.get(`/users/:userId`, async (req, res) => {
     const {userId} = req.params;
+    const isUserExist = await userService.findUserById(userId);
+
+    if (!isUserExist) {
+      return res.status(HttpCode.NOT_FOUND).json({
+        error: true,
+        status: HttpCode.NOT_FOUND,
+        message: `User with id ${userId} not found`
+      });
+    }
+
     const userArticles = await articleService.findAllByUser(userId);
 
     return res.status(HttpCode.SUCCESS).json(formatArticleDate(userArticles));
   });
 
-  articlesRouter.post(`/:articleId/comments`, commentValidator, async (req, res) => {
+  articlesRouter.post(`/:articleId/comments`, checkParamIsInteger, ...newCommentFormFieldsRules, async (req, res) => {
     const {articleId} = req.params;
+    const errors = validateForm(req);
     const article = await articleService.findOne(articleId);
-    let commentData = {...req.body};
+    let commentFormData = {...req.body};
 
     if (!article) {
       return res.status(HttpCode.NOT_FOUND)
@@ -164,18 +231,26 @@ const getArticlesRouter = (articleService, commentService, categoryService) => {
       });
     }
 
-    commentData = {
-      ...commentData,
+    if (errors.length > 0) {
+      return res.status(HttpCode.BAD_REQUEST).send({
+        errors,
+        article,
+        commentFormData
+      });
+    }
+
+    commentFormData = {
+      ...commentFormData,
       userId: 2,
       articleId,
       createdDate: convertDate(moment())
     };
 
-    const newСomment = await commentService.createComment(article, commentData);
+    const newСomment = await commentService.createComment(article, commentFormData);
     return res.status(HttpCode.CREATED).json(newСomment);
   });
 
-  articlesRouter.delete(`/comments/:commentId`, async (req, res) => {
+  articlesRouter.delete(`/comments/:commentId`, checkParamIsInteger, async (req, res) => {
     const {commentId} = req.params;
     const comment = await commentService.findOne(commentId);
 

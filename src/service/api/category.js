@@ -1,7 +1,9 @@
 'use strict';
 
 const {Router} = require(`express`);
-const categoryValidator = require(`../middlewares/category-validator`);
+const {newCategoryFormFieldsRules} = require(`../form-validation`);
+const {validateFormByFields} = require(`../../utils`);
+const {checkParamIsInteger} = require(`../middlewares/param-validator`);
 const {HttpCode} = require(`../../constants`);
 
 const getCategoryRouter = (categoryService) => {
@@ -36,16 +38,15 @@ const getCategoryRouter = (categoryService) => {
     return res.status(HttpCode.SUCCESS).json(deletedCategory);
   });
 
-  categoryRouter.post(`/`, categoryValidator, async (req, res) => {
-    const categoryData = req.body;
-    const isCategoryExist = await categoryService.findOne(categoryData.title);
+  categoryRouter.post(`/`, ...newCategoryFormFieldsRules, async (req, res) => {
+    const categoryData = {...req.body};
+    const newCategoryError = validateFormByFields(req);
 
-    if (isCategoryExist) {
-      return res.status(HttpCode.SUCCESS)
-      .json({
-        error: true,
-        status: HttpCode.SUCCESS,
-        message: `Category already exists`
+    if (Object.keys(newCategoryError).length > 0) {
+      const categories = await categoryService.findAll();
+      return res.status(HttpCode.BAD_REQUEST).json({
+        categories,
+        newCategoryError
       });
     }
 
@@ -53,28 +54,25 @@ const getCategoryRouter = (categoryService) => {
     return res.status(HttpCode.CREATED).json(newCategory);
   });
 
-  categoryRouter.put(`/:categoryId`, async (req, res) => {
+  categoryRouter.put(`/:categoryId`, checkParamIsInteger, ...newCategoryFormFieldsRules, async (req, res) => {
     const {categoryId} = req.params;
-    const categoryData = req.body;
-    const category = await categoryService.findCategoryById(categoryId);
+    const categoryData = {...req.body};
+    const error = validateFormByFields(req);
+    const isCategoryExist = await categoryService.findCategoryById(categoryId);
 
-    if (!category) {
-      return res.status(HttpCode.NOT_FOUND)
-      .json({
+    if (!isCategoryExist) {
+      return res.status(HttpCode.NOT_FOUND).json({
         error: true,
         status: HttpCode.NOT_FOUND,
-        message: `Category is not found`
+        message: `Category with id ${categoryId} not found`
       });
     }
 
-    const isCategoryExist = await categoryService.findOne(categoryData.title);
-
-    if (isCategoryExist) {
-      return res.status(HttpCode.SUCCESS)
-      .json({
-        error: true,
-        status: HttpCode.SUCCESS,
-        message: `Category already exists`
+    if (Object.keys(error).length > 0) {
+      const categories = await categoryService.findAllWithArticlesCount();
+      return res.status(HttpCode.BAD_REQUEST).json({
+        categories,
+        error
       });
     }
 

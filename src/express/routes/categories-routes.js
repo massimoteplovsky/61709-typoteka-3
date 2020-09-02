@@ -1,8 +1,6 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {validationResult} = require(`express-validator`);
-const {newCategoryFormFieldsRules} = require(`../form-validation`);
 
 const getCategoriesRouter = (service) => {
   const categoriesRouter = new Router();
@@ -16,7 +14,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/delete/:categoryId`, async (req, res, next) => {
+  categoriesRouter.post(`/:categoryId/delete`, async (req, res, next) => {
     try {
       const {categoryId} = req.params;
       await service.deleteCategory(categoryId);
@@ -27,21 +25,15 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/`, ...newCategoryFormFieldsRules, async (req, res, next) => {
+  categoriesRouter.post(`/`, async (req, res, next) => {
     try {
-      const error = validationResult(req).mapped();
-      const categories = await service.getAllCategories();
       let categoryData = {...req.body};
-
-      if (Object.keys(error).length > 0) {
-        return res.render(`all-categories`, {error, categories, categoryData});
-      }
 
       const createdCategory = await service.createNewCategory(categoryData);
 
-      if (createdCategory.error) {
-        error.title = {msg: `Категория уже существует`};
-        return res.render(`all-categories`, {error, categories, categoryData});
+      if (createdCategory.validationError) {
+        const {newCategoryError, categories} = createdCategory;
+        return res.render(`all-categories`, {newCategoryError, categories, newCategoryData: categoryData});
       }
 
       return res.redirect(`/categories`);
@@ -50,22 +42,15 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/:categoryId`, ...newCategoryFormFieldsRules, async (req, res, next) => {
+  categoriesRouter.post(`/:categoryId`, async (req, res, next) => {
     try {
       const {categoryId} = req.params;
-      const error = validationResult(req).mapped();
-      const categories = await service.getAllCategories();
       let categoryData = {...req.body};
-
-      if (Object.keys(error).length > 0) {
-        return res.render(`all-categories`, {error, categories, categoryData, categoryId});
-      }
 
       const updatedCategory = await service.updateCategory(categoryId, categoryData);
 
-      if (updatedCategory.error) {
-        error.title = {msg: `Категория уже существует`};
-        console.log(error);
+      if (updatedCategory.validationError) {
+        const {error, categories} = updatedCategory;
         return res.render(`all-categories`, {error, categories, categoryData, categoryId});
       }
 

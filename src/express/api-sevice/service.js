@@ -1,5 +1,7 @@
 'use strict';
 
+const {HttpCode} = require(`../../constants`);
+
 class ApiService {
 
   constructor(api) {
@@ -27,11 +29,43 @@ class ApiService {
   }
 
   async createNewArticle(articleData) {
-    return await this._api.post(`/articles`, articleData);
+    try {
+      return await this._api.post(`/articles`, articleData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {errors, categories}} = response;
+        return {
+          validationError: true,
+          errors,
+          categories
+        };
+      }
+
+      throw err;
+    }
   }
 
   async updateArticle(articleId, articleData) {
-    return await this._api.put(`/articles/${articleId}`, articleData);
+    try {
+      return await this._api.put(`/articles/${articleId}`, articleData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {errors, article, categories}} = response;
+
+        return {
+          validationError: true,
+          article,
+          errors,
+          categories
+        };
+      }
+
+      throw err;
+    }
   }
 
   async getAllCategories() {
@@ -43,11 +77,43 @@ class ApiService {
   }
 
   async createNewCategory(categoryData) {
-    return await this._api.post(`/categories`, categoryData);
+    try {
+      return await this._api.post(`/categories`, categoryData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {newCategoryError, categories}} = response;
+
+        return {
+          validationError: true,
+          newCategoryError,
+          categories
+        };
+      }
+
+      throw err;
+    }
   }
 
   async updateCategory(categoryId, categoryData) {
-    return await this._api.put(`/categories/${categoryId}`, categoryData);
+    try {
+      return await this._api.put(`/categories/${categoryId}`, categoryData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {error, categories}} = response;
+
+        return {
+          validationError: true,
+          error,
+          categories
+        };
+      }
+
+      throw err;
+    }
   }
 
   async deleteCategory(categoryId) {
@@ -59,7 +125,23 @@ class ApiService {
   }
 
   async createComment(articleId, commentData) {
-    return await this._api.post(`/articles/${articleId}/comments`, commentData);
+    try {
+      return await this._api.post(`/articles/${articleId}/comments`, commentData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {errors, article, commentFormData}} = response;
+        return {
+          validationError: true,
+          errors,
+          article,
+          commentFormData
+        };
+      }
+
+      throw err;
+    }
   }
 
   async deleteComment(commentId) {

@@ -11,13 +11,13 @@ block content
             type='text'
             name='title'
             placeholder='Новая категория'
-            value=`${categoryData && !categoryId ? categoryData.title : ``}`
+            value=`${newCategoryData ? newCategoryData.title : ``}`
           )
           label(for='add-form-add-category')
             span.visually-hidden Добавить категорию
           button.category__button.button.button--category(type='submit') Добавить
-        if error && !categoryId
-          p.form__error-message= error.title.msg
+        if newCategoryError
+          p.form__error-message= newCategoryError.title.msg
       if categories.length > 0
         ul.category__list
           each category in categories

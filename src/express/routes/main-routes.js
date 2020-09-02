@@ -1,11 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {multer, storage} = require(`../file-uploader`);
+const {fileUploader} = require(`../file-uploader`);
 const {validationResult} = require(`express-validator`);
 const {newUserFormFieldsRules} = require(`../form-validation`);
 const {truncateText} = require(`../../utils`);
-const upload = multer({storage}).single(`avatar`);
+const upload = fileUploader.single(`avatar`);
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
 const MEGABYTE_IN_BYTES = 1048576;

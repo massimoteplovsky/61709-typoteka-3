@@ -1,18 +1,8 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {validationResult} = require(`express-validator`);
-const {multer, storage} = require(`../file-uploader`);
-const {
-  newArticleFormFieldsRules,
-  newCommentFormFieldsRules
-} = require(`../form-validation`);
-const {convertDate} = require(`../../utils`);
-const upload = multer({storage}).single(`picture`);
-
-const MAX_FILE_SIZE = 15 * 1024 * 1024;
-const MEGABYTE_IN_BYTES = 1048576;
-const VALID_MIME_TYPES = [`image/png`, `image/jpg`, `image/jpeg`];
+const {fileUploader} = require(`../file-uploader`);
+const upload = fileUploader.single(`picture`);
 
 const getArticlesRouter = (service) => {
 
@@ -53,39 +43,22 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/add`, upload, ...newArticleFormFieldsRules, async (req, res, next) => {
+  articlesRouter.post(`/add`, upload, async (req, res, next) => {
     try {
-      const fileErrorMsg = `Неверный формат (только jpg/jpeg/png), большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`;
-      const errorsListFormatter = ({msg}) => msg;
-      const errors = {
-        errorsList: validationResult(req).formatWith(errorsListFormatter).array(),
-        errorByField: validationResult(req).mapped()
-      };
       const file = req.file;
-      let formFieldsData = {...req.body};
+      let articleData = {...req.body};
 
-      if (file && (!VALID_MIME_TYPES.includes(file.mimetype) || file.size > MAX_FILE_SIZE)) {
-        errors.errorsList.push(fileErrorMsg);
-        errors.errorByField.picture = {msg: fileErrorMsg};
-      }
-
-      formFieldsData = {
-        ...formFieldsData,
+      articleData = {
+        ...articleData,
         picture: file ? file.filename : null
       };
 
-      if (errors.errorsList.length || Object.keys(errors.errorByField).length) {
-        const categories = await service.getAllCategories();
-        return res.render(`article-new`, {errors, categories, formFieldsData});
+      const articleCreationResult = await service.createNewArticle(articleData);
+
+      if (articleCreationResult.validationError) {
+        const {errors, categories} = articleCreationResult;
+        return res.render(`article-new`, {errors, categories, articleData});
       }
-
-      formFieldsData = {
-        ...formFieldsData,
-        createdDate: convertDate(formFieldsData.createdDate),
-        userId: 1
-      };
-
-      await service.createNewArticle(formFieldsData);
 
       return res.redirect(`/my`);
     } catch (err) {
@@ -93,41 +66,28 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/edit/:articleId`, upload, ...newArticleFormFieldsRules, async (req, res, next) => {
+  articlesRouter.post(`/edit/:articleId`, upload, async (req, res, next) => {
     try {
-      const fileErrorMsg = `Неверный формат (только jpg/jpeg/png), большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`;
       const {articleId} = req.params;
-      const errorsListFormatter = ({msg}) => msg;
-      const errors = {
-        errorsList: validationResult(req).formatWith(errorsListFormatter).array(),
-        errorByField: validationResult(req).mapped()
-      };
       const file = req.file;
-      let formFieldsData = {...req.body};
+      let articleData = {...req.body};
 
-      if (file && (!VALID_MIME_TYPES.includes(file.mimetype) || file.size > MAX_FILE_SIZE)) {
-        errors.errorsList.push(fileErrorMsg);
-        errors.errorByField.picture = {msg: fileErrorMsg};
-      }
-
-      formFieldsData = {
-        ...formFieldsData,
+      articleData = {
+        ...articleData,
         picture: file ? file.filename : null
       };
 
-      if (errors.errorsList.length || Object.keys(errors.errorByField).length) {
-        const article = await service.getArticleById(articleId);
-        const categories = await service.getAllCategories();
-        return res.render(`article-edit`, {errors, article, categories, formFieldsData});
+      const articleUpdateResult = await service.updateArticle(articleId, articleData);
+
+      if (articleUpdateResult.validationError) {
+        const {errors, article, categories} = articleUpdateResult;
+        return res.render(`article-edit`, {
+          errors,
+          article,
+          categories,
+          articleData: {...articleData, categories: articleData.categories ? articleData.categories : []},
+        });
       }
-
-      formFieldsData = {
-        ...formFieldsData,
-        createdDate: convertDate(formFieldsData.createdDate),
-        userId: 1
-      };
-
-      await service.updateArticle(articleId, formFieldsData);
 
       return res.redirect(`/my`);
     } catch (err) {
@@ -169,19 +129,17 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/:id/comments`, ...newCommentFormFieldsRules, async (req, res, next) => {
+  articlesRouter.post(`/:id/comments`, async (req, res, next) => {
     try {
       const articleId = req.params.id;
-      const commentData = req.body;
-      const errorsListFormatter = ({msg}) => msg;
-      const errors = validationResult(req).formatWith(errorsListFormatter).array();
+      const commentData = {...req.body};
 
-      if (errors.length > 0) {
-        const article = await service.getArticleById(articleId);
-        return res.render(`article`, {errors, article, commentData});
+      const commentCreationResult = await service.createComment(articleId, commentData);
+
+      if (commentCreationResult.validationError) {
+        const {errors, article, commentFormData} = commentCreationResult;
+        return res.render(`article`, {errors, article, commentFormData});
       }
-
-      await service.createComment(articleId, commentData);
 
       return res.redirect(`/articles/${articleId}`);
     } catch (err) {

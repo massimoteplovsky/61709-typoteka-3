@@ -3,8 +3,9 @@
 const path = require(`path`);
 const multer = require(`multer`);
 const VALID_MIME_TYPES = [`image/png`, `image/jpg`, `image/jpeg`];
+const MAX_FILE_SIZE = 15 * 1024 * 1024;
 
-const storage = multer.diskStorage({
+const storageConfig = multer.diskStorage({
   destination: (req, file, cb) =>{
     cb(null, path.resolve(__dirname, `../express/public`, `img`));
   },
@@ -14,16 +15,17 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file && VALID_MIME_TYPES.includes(file.mimetype)) {
+  if (VALID_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    req.fileValidationError = true;
     cb(null, false);
   }
 };
 
-module.exports = {
-  multer,
-  storage,
-  fileFilter
-};
+const fileUploader = multer({
+  storage: storageConfig,
+  fileFilter,
+  limits: {fileSize: MAX_FILE_SIZE}
+});
+
+module.exports = {fileUploader, multer};

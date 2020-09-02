@@ -3,6 +3,7 @@
 const fs = require(`fs`).promises;
 const moment = require(`moment`);
 const chalk = require(`chalk`);
+const {validationResult} = require(`express-validator`);
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
@@ -112,6 +113,10 @@ const truncateText = (text, symbolCount) => {
   return text.length > symbolCount ? `${text.slice(0, symbolCount)}...` : text;
 };
 
+const errorsListFormatter = ({msg}) => msg;
+const validateForm = (req) => validationResult(req).formatWith(errorsListFormatter).array();
+const validateFormByFields = (req) => validationResult(req).mapped();
+
 module.exports = {
   getRandomInt,
   shuffle,
@@ -121,5 +126,7 @@ module.exports = {
   convertDate,
   formatArticleDate,
   highlightArticleTitle,
-  truncateText
+  truncateText,
+  validateForm,
+  validateFormByFields
 };

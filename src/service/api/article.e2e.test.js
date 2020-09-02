@@ -15,7 +15,7 @@ const incorrectArticleData = {
 };
 
 const getArticleWithId = async () => {
-  const articlesData = await request(server).get(`/api/articles`);
+  const articlesData = await request(server).get(`/api/articles?activePage=1`);
   const {articles} = articlesData.body;
   return {
     articleId: articles[0].id,
@@ -23,13 +23,19 @@ const getArticleWithId = async () => {
   };
 };
 
+const getUserId = async () => {
+  const users = await request(server).get(`/api/users`);
+  return users.body[0].id;
+};
+
 let server;
 let newArticleData;
 let updatedArticleData;
+let invalidArticleData;
 
 beforeAll(async () => {
   server = await getServer();
-  const testingCategoryData = await request(server).post(`/api/categories`).send({title: `Тестовая категория ${Date.now()}`});
+  const testingCategoryData = await request(server).post(`/api/categories`).send({title: `Категория ${Date.now()}`});
   const testingUserData = await request(server).post(`/api/users`).send({
     firstname: `Тестовый`,
     lastname: `Юзер`,
@@ -39,20 +45,29 @@ beforeAll(async () => {
   });
 
   newArticleData = {
-    title: `Новинки музыки`,
+    title: `Новинки музыки. Топовая музыка каждый день`,
     announce: `Простые ежедневные упражнения помогут достичь успеха.`,
     fullText: `Тяжело найти качественную музыку`,
-    createdDate: `2020-06-17`,
+    createdDate: `17.06.2020`,
+    categories: [testingCategoryData.body.id],
+    userId: testingUserData.body.id
+  };
+
+  invalidArticleData = {
+    title: ``,
+    announce: `Простые ежедневные упражнения помогут достичь успеха.`,
+    fullText: `Тяжело найти качественную музыку`,
+    createdDate: `17.06.2020`,
     categories: [testingCategoryData.body.id],
     picture: `picture.png`,
     userId: testingUserData.body.id
   };
 
   updatedArticleData = {
-    title: `Новинки музыки`,
+    title: `Новинки музыки. Топовая музыка каждый день`,
     announce: `Простые ежедневные упражнения помогут достичь успеха.`,
     fullText: `Тяжело найти хороший б/у автомобиль`,
-    createdDate: `2020-04-17 20:25`,
+    createdDate: `17.06.2020`,
     categories: [testingCategoryData.body.id],
     picture: ``
   };
@@ -79,15 +94,25 @@ describe(`Articles API end-to-end tests`, () => {
       const res = await request(server).post(`/api/articles`).send(incorrectArticleData);
 
       expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
-      expect(res.body.error).toBeTruthy();
-      expect(res.body.status).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Not all article form fields sent. Request must end with status code 400 (not all fields)`, async () => {
+      const res = await request(server).post(`/api/articles`).send(incorrectArticleData);
+
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+    });
+
+    test(`Invalid article data sent. Request must end with status code 400 (invalid data sent)`, async () => {
+      const res = await request(server).post(`/api/articles`).send(invalidArticleData);
+
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
     });
   });
 
   describe(`Get all articles tests`, () => {
 
     test(`Get all articles with status code 200`, async () => {
-      const res = await request(server).get(`/api/articles`);
+      const res = await request(server).get(`/api/articles?activePage=1`);
       const {articles, mostDiscussedArticles} = res.body;
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
@@ -122,7 +147,7 @@ describe(`Articles API end-to-end tests`, () => {
       const categoriesData = await request(server).get(`/api/categories`);
       const [category] = categoriesData.body;
       const categoryId = category.id;
-      const res = await request(server).get(`/api/articles/category/${categoryId}`);
+      const res = await request(server).get(`/api/articles/category/${categoryId}?activePage=1`);
       const {articles} = res.body;
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
@@ -142,21 +167,21 @@ describe(`Articles API end-to-end tests`, () => {
   describe(`Get user articles with comments tests`, () => {
 
     test(`Get user articles with comments with status code 200`, async () => {
-      const userId = 1;
+      const userId = await getUserId();
       const res = await request(server).get(`/api/articles/users/${userId}/comments`);
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
       expect(Array.isArray(res.body)).toBe(true);
     });
 
-    // test(`Get user articles with comments with status code 404 (user not found)`, async () => {
-    //   const userId = 99999;
-    //   const res = await request(server).get(`/api/articles/users/${userId}/comments`);
+    test(`Get user articles with comments with status code 404 (user not found)`, async () => {
+      const userId = 9999999;
+      const res = await request(server).get(`/api/articles/users/${userId}/comments`);
 
-    //   expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
-    //   expect(res.body.error).toBeTruthy();
-    //   expect(res.body.status).toBe(HttpCode.NOT_FOUND);
-    // });
+      expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.status).toBe(HttpCode.NOT_FOUND);
+    });
   });
 
   describe(`Get last users comments from articles tests`, () => {
@@ -172,21 +197,23 @@ describe(`Articles API end-to-end tests`, () => {
   describe(`Get user articles by user id tests`, () => {
 
     test(`Get user articles with status code 200`, async () => {
-      const userId = 1;
+      const userId = await getUserId();
       const res = await request(server).get(`/api/articles/users/${userId}`);
+
+      console.log(res.body);
 
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
       expect(Array.isArray(res.body)).toBe(true);
     });
 
-    // test(`Get user articles with status code 404 (user not found)`, async () => {
-    //   const userId = 99999;
-    //   const res = await request(server).get(`/api/articles/users/${userId}`);
+    test(`Get user articles with status code 404 (user not found)`, async () => {
+      const userId = 99999;
+      const res = await request(server).get(`/api/articles/users/${userId}`);
 
-    //   expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
-    //   expect(res.body.error).toBeTruthy();
-    //   expect(res.body.status).toBe(HttpCode.NOT_FOUND);
-    // });
+      expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.status).toBe(HttpCode.NOT_FOUND);
+    });
   });
 
   describe(`Create a new article comment tests`, () => {
@@ -194,15 +221,14 @@ describe(`Articles API end-to-end tests`, () => {
     test(`Create a new article comment with status code 200`, async () => {
       const {articleId} = await getArticleWithId();
       const commentData = {
-        text: `New test comment`,
-        articleId,
-        userId: 1
+        text: `New test comment. New test comment. New test comment.`
       };
       const res = await request(server).post(`/api/articles/${articleId}/comments`).send(commentData);
       const returnedComment = {
         ...commentData,
         id: res.body.id,
         createdDate: res.body.createdDate,
+        articleId,
         userId: res.body.userId
       };
 
@@ -210,14 +236,12 @@ describe(`Articles API end-to-end tests`, () => {
       expect(res.body).toStrictEqual(returnedComment);
     });
 
-    test(`Create a new article comment with status code 400 (incorrect comment data)`, async () => {
+    test(`Create a new article comment with status code 400 (incorrect or invalid comment form field data)`, async () => {
       const {articleId} = await getArticleWithId();
       const commentData = {message: `New test comment`};
       const res = await request(server).post(`/api/articles/${articleId}/comments`).send(commentData);
 
       expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
-      expect(res.body.error).toBeTruthy();
-      expect(res.body.status).toBe(HttpCode.BAD_REQUEST);
     });
 
     test(`Create a new article comment with status code 404 (article not found)`, async () => {
@@ -267,17 +291,15 @@ describe(`Articles API end-to-end tests`, () => {
       expect(typeof res.body).toBe(`object`);
     });
 
-    test(`Update article by id with status code 400 (incorrect article data)`, async () => {
+    test(`Update article by id with status code 400 (incorrect or invalid form fields article data)`, async () => {
       const {articleId} = await getArticleWithId();
       const res = await request(server).put(`/api/articles/${articleId}`).send(incorrectArticleData);
 
       expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
-      expect(res.body.error).toBeTruthy();
-      expect(res.body.status).toBe(HttpCode.BAD_REQUEST);
     });
 
     test(`Update article by id with status code 404 (article not found)`, async () => {
-      const articleId = `99999`;
+      const articleId = 99999;
       const res = await request(server).put(`/api/articles/${articleId}`).send(newArticleData);
 
       expect(res.statusCode).toBe(HttpCode.NOT_FOUND);

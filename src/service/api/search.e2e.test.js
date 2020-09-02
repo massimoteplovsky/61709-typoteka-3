@@ -6,7 +6,7 @@ const {sequelize} = require(`../db-config/db`);
 const {HttpCode} = require(`../../constants`);
 
 const getArticleWithId = async () => {
-  const articlesData = await request(server).get(`/api/articles`);
+  const articlesData = await request(server).get(`/api/articles?activePage=1`);
   const {articles} = articlesData.body;
   return {
     articleId: articles[0].id,
@@ -18,7 +18,7 @@ let server;
 
 beforeAll(async () => {
   server = await getServer();
-  const testingCategoryData = await request(server).post(`/api/categories`).send({title: `Тестовая категория ${Date.now()}`});
+  const testingCategoryData = await request(server).post(`/api/categories`).send({title: `Категория ${Date.now()}`});
   const testingUserData = await request(server).post(`/api/users`).send({
     firstname: `Тестовый`,
     lastname: `Юзер`,
@@ -28,12 +28,11 @@ beforeAll(async () => {
   });
 
   await request(server).post(`/api/articles`).send({
-    title: `Новинки музыки`,
+    title: `Новинки музыки. Топовая музыка каждый день`,
     announce: `Простые ежедневные упражнения помогут достичь успеха.`,
     fullText: `Тяжело найти качественную музыку`,
-    createdDate: `2020-06-17`,
+    createdDate: `17.06.2020`,
     categories: [testingCategoryData.body.id],
-    picture: `picture.png`,
     userId: testingUserData.body.id
   });
 });

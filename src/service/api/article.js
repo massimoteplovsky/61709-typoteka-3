@@ -234,8 +234,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
     if (errors.length > 0) {
       return res.status(HttpCode.BAD_REQUEST).send({
         errors,
-        article,
-        commentFormData
+        article
       });
     }
 

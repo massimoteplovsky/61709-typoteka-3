@@ -45,7 +45,7 @@ block content
                   rows='1'
                   name='text'
                   placeholder='Присоединиться к обсуждению'
-                )= commentFormData ? commentFormData.text : ``
+                )= commentData ? commentData.text : ``
               button.comments__button.button.button--colored(type='submit') Опубликовать
             //- .comments__footer.comments__footer--visitor
             //-   button.comments__button.button.button--colored(type='submit') Войти

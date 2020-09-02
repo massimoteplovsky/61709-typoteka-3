@@ -32,6 +32,10 @@ class User extends Sequelize.Model {
         type: DataTypes.STRING,
         allowNull: false
       },
+      role: {
+        type: DataTypes.STRING,
+        allowNull: false
+      }
     }, {
       sequelize,
       tableName: `users`,

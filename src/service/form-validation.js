@@ -2,8 +2,12 @@
 
 const {check} = require(`express-validator`);
 const CategoryService = require(`./data-service/category`);
+const UserService = require(`./data-service/user`);
+const MAX_FILE_SIZE = 15 * 1024 * 1024;
+const MEGABYTE_IN_BYTES = 1048576;
 
 const categoryService = new CategoryService();
+const userService = new UserService();
 
 const newArticleFormFieldsRules = [
   check(`title`)
@@ -91,7 +95,17 @@ const newUserFormFieldsRules = [
     .withMessage(`Введите почту`)
     .bail()
     .isEmail()
-    .withMessage(`Почта введена некорректно`),
+    .withMessage(`Почта введена некорректно`)
+    .bail()
+    .custom(async (email) => {
+      const isUserExist = await userService.findUserByEmail(email);
+
+      if (isUserExist) {
+        throw Error(`Пользователь с такой почтой уже существует`);
+      }
+
+      return true;
+    }),
   check(`firstname`)
     .trim()
     .notEmpty()
@@ -127,7 +141,17 @@ const newUserFormFieldsRules = [
     .isLength({min: 6})
     .withMessage(`Пароль для подтверждения должен содержать минимум 6 символов`)
     .bail()
-    .custom((value, {req}) => value !== req.body.password)
+    .custom((value, {req}) => {
+      if (value !== req.body.password) {
+        throw Error(`Пароли не совпадают`);
+      }
+
+      return true;
+    }),
+  check(`avatar`)
+    .trim()
+    .notEmpty()
+    .withMessage(`Файл не выбран. Неверный формат файла (только jpg/jpeg/png). Большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`)
 ];
 
 module.exports = {

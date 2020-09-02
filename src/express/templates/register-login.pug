@@ -6,16 +6,16 @@ block content
     h1.visually-hidden Регистрация пользователя
     section.modal(style=`overflow: auto;`)
       .popup.popup--registration
-        button.popup__button.button.button--popup-close(type='button', aria-label='Закрыть окно' onclick='history.back()')
+        button.popup__button.button.button--popup-close(type='button', aria-label='Закрыть окно' onclick='location="/"')
           | Закрыть
           | окно
         h2.visually-hidden Форма регистрации
         ul.popup__tabs
-          li.popup__tab.popup__tab--active.popup__tab--register
+          li(class=`popup__tab popup__tab--register ${activeTab === 'register' ? 'popup__tab--active' : ''}`)
             button.popup__tab-switcher.button(type='button') Регистрация
-          li.popup__tab.popup__tab--log-in
+          li(class=`popup__tab popup__tab--log-in ${activeTab === 'login' ? 'popup__tab--active' : ''}`)
             button.popup__tab-switcher.button(type='button') Войти
-        .popup__form.popup__form--active.form.form--register
+        div(class=`popup__form form form--register ${activeTab === 'register' ? 'popup__form--active' : 'popup__form--hidden'}`)
           form(
               action='/register'
               method='POST'
@@ -87,7 +87,7 @@ block content
               ul.form__errors
                 each error in errors.errorsList
                   li.form__error= error
-        .popup__form.popup__form--hidden.form.form--log-in
+        div(class=`popup__form form form--log-in ${activeTab === 'login' ? 'popup__form--active' : 'popup__form--hidden'}`)
           form(action='#', method='get')
             .form__field
               label

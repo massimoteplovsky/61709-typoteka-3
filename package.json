@@ -5,6 +5,7 @@
   "main": "./src/service/service.js",
   "dependencies": {
     "axios": "0.19.2",
+    "bcrypt": "5.0.0",
     "chalk": "4.0.0",
     "concurrently": "5.2.0",
     "cross-env": "7.0.2",

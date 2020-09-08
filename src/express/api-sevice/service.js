@@ -131,12 +131,11 @@ class ApiService {
       const {response} = err;
 
       if (response.status === HttpCode.BAD_REQUEST) {
-        const {data: {errors, article, commentFormData}} = response;
+        const {data: {errors, article}} = response;
         return {
           validationError: true,
           errors,
-          article,
-          commentFormData
+          article
         };
       }
 
@@ -157,7 +156,21 @@ class ApiService {
   }
 
   async createUser(userData) {
-    return await this._api.post(`/users`, userData);
+    try {
+      return await this._api.post(`/users`, userData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {errors}} = response;
+        return {
+          validationError: true,
+          errors
+        };
+      }
+
+      throw err;
+    }
   }
 
 }

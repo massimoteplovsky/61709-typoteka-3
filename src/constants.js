@@ -50,6 +50,11 @@ const HttpCode = {
   UNAUTHORIZED: 401
 };
 
+const UserRole = {
+  READER: `reader`,
+  ADMIN: `admin`
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
@@ -57,6 +62,7 @@ module.exports = {
   MAX_ID_LENGTH,
   MAX_COMMENTS_COUNT,
   API_PREFIX,
+  UserRole,
   DefaultPort,
   FilePath,
   DateOption,

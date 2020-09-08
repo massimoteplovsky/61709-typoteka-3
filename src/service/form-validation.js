@@ -2,6 +2,8 @@
 
 const {check} = require(`express-validator`);
 const CategoryService = require(`./data-service/category`);
+const MAX_FILE_SIZE = 15 * 1024 * 1024;
+const MEGABYTE_IN_BYTES = 1048576;
 
 const categoryService = new CategoryService();
 
@@ -127,7 +129,17 @@ const newUserFormFieldsRules = [
     .isLength({min: 6})
     .withMessage(`Пароль для подтверждения должен содержать минимум 6 символов`)
     .bail()
-    .custom((value, {req}) => value !== req.body.password)
+    .custom((value, {req}) => {
+      if (value !== req.body.password) {
+        throw Error(`Пароли не совпадают`);
+      }
+
+      return true;
+    }),
+  check(`avatar`)
+    .trim()
+    .notEmpty()
+    .withMessage(`Файл не выбран. Неверный формат файла (только jpg/jpeg/png). Большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`)
 ];
 
 module.exports = {

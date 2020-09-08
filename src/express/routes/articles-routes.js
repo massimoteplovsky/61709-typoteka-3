@@ -137,8 +137,8 @@ const getArticlesRouter = (service) => {
       const commentCreationResult = await service.createComment(articleId, commentData);
 
       if (commentCreationResult.validationError) {
-        const {errors, article, commentFormData} = commentCreationResult;
-        return res.render(`article`, {errors, article, commentFormData});
+        const {errors, article} = commentCreationResult;
+        return res.render(`article`, {errors, article, commentData});
       }
 
       return res.redirect(`/articles/${articleId}`);

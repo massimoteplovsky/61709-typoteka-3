@@ -2,12 +2,10 @@
 
 const {check} = require(`express-validator`);
 const CategoryService = require(`./data-service/category`);
-const UserService = require(`./data-service/user`);
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
 const MEGABYTE_IN_BYTES = 1048576;
 
 const categoryService = new CategoryService();
-const userService = new UserService();
 
 const newArticleFormFieldsRules = [
   check(`title`)
@@ -95,17 +93,7 @@ const newUserFormFieldsRules = [
     .withMessage(`Введите почту`)
     .bail()
     .isEmail()
-    .withMessage(`Почта введена некорректно`)
-    .bail()
-    .custom(async (email) => {
-      const isUserExist = await userService.findUserByEmail(email);
-
-      if (isUserExist) {
-        throw Error(`Пользователь с такой почтой уже существует`);
-      }
-
-      return true;
-    }),
+    .withMessage(`Почта введена некорректно`),
   check(`firstname`)
     .trim()
     .notEmpty()

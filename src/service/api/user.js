@@ -22,16 +22,23 @@ const getUserRouter = (userService) => {
     };
     let userData = {...req.body};
 
+    const user = await userService.findUserByEmail(userData.email);
+
+    if (user) {
+      errors.errorsList.push(`Пользователь с такой почтой ${user.email} уже существует.`);
+      errors.errorByField[`email`] = {msg: `Пользователь с такой почтой ${user.email} уже существует.`};
+    }
+
     if (errors.errorsList.length > 0) {
       return res.status(HttpCode.BAD_REQUEST).send({errors});
     }
 
-    const allUsers = await userService.findAll();
+    const usersCount = await userService.countUsers();
 
     userData = {
       ...userData,
       password: await bcrypt.hash(userData.password, saltRounds),
-      role: allUsers.length > 0 ? UserRole.READER : UserRole.ADMIN
+      role: usersCount > 0 ? UserRole.READER : UserRole.ADMIN
     };
 
     const newUser = await userService.createUser(userData);

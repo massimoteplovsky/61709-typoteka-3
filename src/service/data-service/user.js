@@ -10,15 +10,19 @@ class UserService {
   }
 
   async findAll() {
-    return User.findAll();
+    return await User.findAll();
+  }
+
+  async countUsers() {
+    return await User.count();
   }
 
   async findUserById(userId) {
-    return User.findByPk(userId);
+    return await User.findByPk(userId);
   }
 
   async findUserByEmail(email) {
-    return User.findOne({where: {email}});
+    return await User.findOne({where: {email}});
   }
 
 }

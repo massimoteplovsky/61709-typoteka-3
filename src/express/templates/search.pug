@@ -10,6 +10,7 @@ block content
           form(action='/search', method='GET')
             label
               input(type='text', name='query' placeholder='Что ищем?' value=`${query ? query : ``}`)
+              input(type='hidden' name='_csrf' value=csrf)
             button.search__button.button.button--transparent(type='submit') Найти
           if articles
             if articles.length

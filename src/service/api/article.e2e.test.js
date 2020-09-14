@@ -41,6 +41,7 @@ beforeAll(async () => {
     lastname: `Юзер`,
     email: `useremail${Date.now()}@mail.ru`,
     password: `12345678`,
+    confirmPassword: `12345678`,
     avatar: `avatar.jpg`
   });
 
@@ -200,8 +201,6 @@ describe(`Articles API end-to-end tests`, () => {
       const userId = await getUserId();
       const res = await request(server).get(`/api/articles/users/${userId}`);
 
-      console.log(res.body);
-
       expect(res.statusCode).toBe(HttpCode.SUCCESS);
       expect(Array.isArray(res.body)).toBe(true);
     });
@@ -220,8 +219,10 @@ describe(`Articles API end-to-end tests`, () => {
 
     test(`Create a new article comment with status code 200`, async () => {
       const {articleId} = await getArticleWithId();
+      const userId = await getUserId();
       const commentData = {
-        text: `New test comment. New test comment. New test comment.`
+        text: `New test comment. New test comment. New test comment.`,
+        userId
       };
       const res = await request(server).post(`/api/articles/${articleId}/comments`).send(commentData);
       const returnedComment = {

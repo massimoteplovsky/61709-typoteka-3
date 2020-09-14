@@ -1,8 +1,13 @@
 'use strict';
 
 const {Router} = require(`express`);
+const csrf = require(`csurf`);
 const {fileUploader} = require(`../file-uploader`);
 const upload = fileUploader.single(`picture`);
+const checkAuth = require(`../check-auth`);
+const {RouteProtectionType} = require(`../../constants`);
+
+const csrfProtection = csrf({cookie: true});
 
 const getArticlesRouter = (service) => {
 
@@ -34,30 +39,32 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.get(`/add`, async (req, res, next) => {
+  articlesRouter.get(`/add`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const categories = await service.getAllCategories();
-      return res.render(`article-new`, {categories});
+      return res.render(`article-new`, {categories, csrf: req.csrfToken()});
     } catch (err) {
       return next(err);
     }
   });
 
-  articlesRouter.post(`/add`, upload, async (req, res, next) => {
+  articlesRouter.post(`/add`, checkAuth(service, RouteProtectionType.FULL, true), upload, csrfProtection, async (req, res, next) => {
     try {
       const file = req.file;
+      const user = req.user;
       let articleData = {...req.body};
 
       articleData = {
         ...articleData,
-        picture: file ? file.filename : null
+        picture: file ? file.filename : null,
+        userId: user.id
       };
 
       const articleCreationResult = await service.createNewArticle(articleData);
 
       if (articleCreationResult.validationError) {
         const {errors, categories} = articleCreationResult;
-        return res.render(`article-new`, {errors, categories, articleData});
+        return res.render(`article-new`, {errors, categories, articleData, csrf: req.csrfToken()});
       }
 
       return res.redirect(`/my`);
@@ -66,15 +73,17 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/edit/:articleId`, upload, async (req, res, next) => {
+  articlesRouter.post(`/edit/:articleId`, checkAuth(service, RouteProtectionType.FULL, true), upload, csrfProtection, async (req, res, next) => {
     try {
       const {articleId} = req.params;
       const file = req.file;
+      const user = req.user;
       let articleData = {...req.body};
 
       articleData = {
         ...articleData,
-        picture: file ? file.filename : null
+        picture: file ? file.filename : null,
+        userId: user.id
       };
 
       const articleUpdateResult = await service.updateArticle(articleId, articleData);
@@ -86,6 +95,7 @@ const getArticlesRouter = (service) => {
           article,
           categories,
           articleData: {...articleData, categories: articleData.categories ? articleData.categories : []},
+          csrf: req.csrfToken()
         });
       }
 
@@ -95,30 +105,30 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.get(`/edit/:id`, async (req, res, next) => {
+  articlesRouter.get(`/edit/:id`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const articleId = req.params.id;
       const article = await service.getArticleById(articleId);
       const categories = await service.getAllCategories();
 
-      return res.render(`article-edit`, {article, categories});
+      return res.render(`article-edit`, {article, categories, csrf: req.csrfToken()});
     } catch (err) {
       return next(err);
     }
   });
 
-  articlesRouter.get(`/:id`, async (req, res, next) => {
+  articlesRouter.get(`/:id`, csrfProtection, async (req, res, next) => {
     try {
       const articleId = req.params.id;
       const article = await service.getArticleById(articleId);
 
-      return res.render(`article`, {article});
+      return res.render(`article`, {article, csrf: req.csrfToken()});
     } catch (err) {
       return next(err);
     }
   });
 
-  articlesRouter.post(`/:id/delete`, async (req, res, next) => {
+  articlesRouter.post(`/:id/delete`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const articleId = req.params.id;
       await service.deleteArticle(articleId);
@@ -129,16 +139,16 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/:id/comments`, async (req, res, next) => {
+  articlesRouter.post(`/:id/comments`, csrfProtection, checkAuth(service, RouteProtectionType.FULL), async (req, res, next) => {
     try {
       const articleId = req.params.id;
-      const commentData = {...req.body};
+      const commentData = {...req.body, userId: req.user.id};
 
       const commentCreationResult = await service.createComment(articleId, commentData);
 
       if (commentCreationResult.validationError) {
         const {errors, article} = commentCreationResult;
-        return res.render(`article`, {errors, article, commentData});
+        return res.render(`article`, {errors, article, commentData, csrf: req.csrfToken()});
       }
 
       return res.redirect(`/articles/${articleId}`);
@@ -147,7 +157,7 @@ const getArticlesRouter = (service) => {
     }
   });
 
-  articlesRouter.post(`/comments/:commentId/delete`, async (req, res, next) => {
+  articlesRouter.post(`/comments/:commentId/delete`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const {commentId} = req.params;
       await service.deleteComment(commentId);

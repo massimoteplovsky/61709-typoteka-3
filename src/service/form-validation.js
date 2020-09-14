@@ -121,7 +121,7 @@ const newUserFormFieldsRules = [
     .bail()
     .isLength({min: 6})
     .withMessage(`Пароль должен содержать минимум 6 символов`),
-  check(`confirm_password`)
+  check(`confirmPassword`)
     .trim()
     .notEmpty()
     .withMessage(`Подтвердите пароль`)
@@ -142,9 +142,27 @@ const newUserFormFieldsRules = [
     .withMessage(`Файл не выбран. Неверный формат файла (только jpg/jpeg/png). Большой размер файла (максимально: ${MAX_FILE_SIZE / MEGABYTE_IN_BYTES} мб)`)
 ];
 
+const loginUserFormFieldsRules = [
+  check(`email`)
+    .trim()
+    .notEmpty()
+    .withMessage(`Введите почту`)
+    .bail()
+    .isEmail()
+    .withMessage(`Почта введена некорректно`),
+  check(`password`)
+    .trim()
+    .notEmpty()
+    .withMessage(`Введите пароль`)
+    .bail()
+    .isLength({min: 6})
+    .withMessage(`Пароль должен содержать минимум 6 символов`)
+];
+
 module.exports = {
   newArticleFormFieldsRules,
   newCategoryFormFieldsRules,
   newCommentFormFieldsRules,
-  newUserFormFieldsRules
+  newUserFormFieldsRules,
+  loginUserFormFieldsRules
 };

@@ -1,20 +1,25 @@
 'use strict';
 
 const {Router} = require(`express`);
+const csrf = require(`csurf`);
+const checkAuth = require(`../check-auth`);
+const {RouteProtectionType} = require(`../../constants`);
+
+const csrfProtection = csrf({cookie: true});
 
 const getCategoriesRouter = (service) => {
   const categoriesRouter = new Router();
 
-  categoriesRouter.get(`/`, async (req, res, next) => {
+  categoriesRouter.get(`/`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
     try {
       const categories = await service.getAllCategoriesWithArticlesCount();
-      return res.render(`all-categories`, {categories});
+      return res.render(`all-categories`, {categories, csrf: req.csrfToken()});
     } catch (err) {
       return next(err);
     }
   });
 
-  categoriesRouter.post(`/:categoryId/delete`, async (req, res, next) => {
+  categoriesRouter.post(`/:categoryId/delete`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
     try {
       const {categoryId} = req.params;
       await service.deleteCategory(categoryId);
@@ -25,7 +30,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/`, async (req, res, next) => {
+  categoriesRouter.post(`/`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
     try {
       let categoryData = {...req.body};
 
@@ -33,7 +38,7 @@ const getCategoriesRouter = (service) => {
 
       if (createdCategory.validationError) {
         const {newCategoryError, categories} = createdCategory;
-        return res.render(`all-categories`, {newCategoryError, categories, newCategoryData: categoryData});
+        return res.render(`all-categories`, {newCategoryError, categories, newCategoryData: categoryData, csrf: req.csrfToken()});
       }
 
       return res.redirect(`/categories`);
@@ -42,7 +47,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/:categoryId`, async (req, res, next) => {
+  categoriesRouter.post(`/:categoryId`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
     try {
       const {categoryId} = req.params;
       let categoryData = {...req.body};
@@ -51,7 +56,7 @@ const getCategoriesRouter = (service) => {
 
       if (updatedCategory.validationError) {
         const {error, categories} = updatedCategory;
-        return res.render(`all-categories`, {error, categories, categoryData, categoryId});
+        return res.render(`all-categories`, {error, categories, categoryData, categoryId, csrf: req.csrfToken()});
       }
 
       return res.redirect(`/categories`);

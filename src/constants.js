@@ -55,6 +55,11 @@ const UserRole = {
   ADMIN: `admin`
 };
 
+const RouteProtectionType = {
+  FULL: `full`,
+  SEMI: `semi`
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
@@ -69,5 +74,6 @@ module.exports = {
   ExitCode,
   GeneratorSlicer,
   ArticleCount,
-  HttpCode
+  HttpCode,
+  RouteProtectionType
 };

@@ -10,7 +10,7 @@ const csrfProtection = csrf({cookie: true});
 const getCategoriesRouter = (service) => {
   const categoriesRouter = new Router();
 
-  categoriesRouter.get(`/`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
+  categoriesRouter.get(`/`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const categories = await service.getAllCategoriesWithArticlesCount();
       return res.render(`all-categories`, {categories, csrf: req.csrfToken()});
@@ -19,7 +19,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/:categoryId/delete`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
+  categoriesRouter.post(`/:categoryId/delete`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const {categoryId} = req.params;
       await service.deleteCategory(categoryId);
@@ -30,7 +30,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
+  categoriesRouter.post(`/`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       let categoryData = {...req.body};
 
@@ -47,7 +47,7 @@ const getCategoriesRouter = (service) => {
     }
   });
 
-  categoriesRouter.post(`/:categoryId`, csrfProtection, checkAuth(service, RouteProtectionType, true), async (req, res, next) => {
+  categoriesRouter.post(`/:categoryId`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
       const {categoryId} = req.params;
       let categoryData = {...req.body};

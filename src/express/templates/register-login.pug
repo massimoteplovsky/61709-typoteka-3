@@ -68,7 +68,7 @@ block content
                   type='password'
                   name='confirmPassword'
                   placeholder='Повтор пароля'
-                  value= userData && userData.confirm_password && (activeTab === `register`) ? userData.confirm_password : ``
+                  value= userData && userData.confirmPassword && (activeTab === `register`) ? userData.confirmPassword : ``
                 )
             if errors && errors.errorByField.confirm_password
               p.form__error-message= errors.errorByField.confirm_password.msg

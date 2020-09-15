@@ -46,7 +46,7 @@ const getMainRouter = (service) => {
     return res.render(`register-login`, {activeTab: `register`, csrf: req.csrfToken()});
   });
 
-  mainRouter.post(`/register`, csrfProtection, checkAuth(service, RouteProtectionType.SEMI), upload, async (req, res, next) => {
+  mainRouter.post(`/register`, checkAuth(service, RouteProtectionType.SEMI), upload, csrfProtection, async (req, res, next) => {
     try {
       const file = req.file;
       let userData = {...req.body};
@@ -84,9 +84,8 @@ const getMainRouter = (service) => {
         return res.render(`register-login`, {errors, userData, activeTab: `login`, csrf: req.csrfToken()});
       }
 
-      const {accessToken, refreshToken, user} = userLoginResult;
+      const {accessToken, user} = userLoginResult;
       res.cookie(`auth_token`, accessToken);
-      res.cookie(`refresh_token`, refreshToken);
       req.app.locals.user = user;
       return res.redirect(`/`);
     } catch (err) {

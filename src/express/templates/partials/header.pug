@@ -13,6 +13,7 @@ header.header
       img(src=`img/${user.avatar}` alt="аватар пользователя")
   else if user && user.role === `admin`
     a.button.button--colored.header__button-new(href='/articles/add') Новая запись
+    a.header__exit(href="/logout") Выйти
     .header__dropdown
       a.button.button--burger.header__burger(href='#') Открыть меню
       ul.navigation.header__navigation

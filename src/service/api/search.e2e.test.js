@@ -24,6 +24,7 @@ beforeAll(async () => {
     lastname: `Юзер`,
     email: `useremail${Date.now()}@mail.ru`,
     password: `12345678`,
+    confirmPassword: `12345678`,
     avatar: `avatar.jpg`
   });
 

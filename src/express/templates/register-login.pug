@@ -28,9 +28,9 @@ block content
                   type='email'
                   name='email'
                   placeholder='Электронная почта'
-                  value= userData && userData.email ? userData.email : ``
+                  value= userData && userData.email && (activeTab === `register`) ? userData.email : ``
                 )
-            if errors && errors.errorByField.email
+            if errors && errors.errorByField.email && (activeTab === `register`)
               p.form__error-message= errors.errorByField.email.msg
             .form__field
               label
@@ -38,9 +38,9 @@ block content
                   type='text'
                   name='firstname'
                   placeholder='Имя'
-                  value= userData && userData.firstname ? userData.firstname : ``
+                  value= userData && userData.firstname && (activeTab === `register`) ? userData.firstname : ``
                 )
-            if errors && errors.errorByField.firstname
+            if errors && errors.errorByField.firstname && (activeTab === `register`)
               p.form__error-message= errors.errorByField.firstname.msg
             .form__field
               label
@@ -48,7 +48,7 @@ block content
                   type='text'
                   name='lastname'
                   placeholder='Фамилия'
-                  value= userData && userData.lastname ? userData.lastname : ``
+                  value= userData && userData.lastname && (activeTab === `register`) ? userData.lastname : ``
                 )
             if errors && errors.errorByField.lastname
               p.form__error-message= errors.errorByField.lastname.msg
@@ -58,17 +58,17 @@ block content
                   type='password'
                   name='password'
                   placeholder='Пароль'
-                  value= userData && userData.password ? userData.password : ``
+                  value= userData && userData.password && (activeTab === `register`) ? userData.password : ``
                 )
-            if errors && errors.errorByField.password
+            if errors && errors.errorByField.password && (activeTab === `register`)
               p.form__error-message= errors.errorByField.password.msg
             .form__field
               label
                 input(
                   type='password'
-                  name='confirm_password'
+                  name='confirmPassword'
                   placeholder='Повтор пароля'
-                  value= userData && userData.confirm_password ? userData.confirm_password : ``
+                  value= userData && userData.confirmPassword && (activeTab === `register`) ? userData.confirmPassword : ``
                 )
             if errors && errors.errorByField.confirm_password
               p.form__error-message= errors.errorByField.confirm_password.msg
@@ -78,22 +78,44 @@ block content
               label
                 input.visually-hidden(type='file' name='avatar')
                 | Загрузить фото профиля
-            if errors && errors.errorByField.avatar
+            if errors && errors.errorByField.avatar && (activeTab === `register`)
               p.form__error-message= errors.errorByField.avatar.msg
+            input(type='hidden' name='_csrf' value=csrf)
             button.form__submit-btn.form__submit-btn--register.button.button--colored(type='submit') Зарегистрироваться
-          if errors && errors.errorsList.length > 0
+          if errors && errors.errorsList.length > 0 && (activeTab === `register`)
             .form__validation-error
               p.form__error-message При создании публикации произошли ошибки:
               ul.form__errors
                 each error in errors.errorsList
                   li.form__error= error
         div(class=`popup__form form form--log-in ${activeTab === 'login' ? 'popup__form--active' : 'popup__form--hidden'}`)
-          form(action='#', method='get')
+          form(action='/login' method='POST')
             .form__field
               label
-                input(type='email', placeholder='Электронная почта', required='')
+                input(
+                  type='email'
+                  name='email'
+                  placeholder='Электронная почта'
+                  value= userData && userData.email && (activeTab === `login`) ? userData.email : ``
+                )
+            if errors && errors.errorByField.email && (activeTab === `login`)
+              p.form__error-message= errors.errorByField.email.msg
             .form__field
               label
-                input(type='password', placeholder='Пароль', required='')
+                input(
+                  type='password'
+                  name='password'
+                  placeholder='Пароль'
+                  value= userData && userData.password && (activeTab === `login`) ? userData.password : ``
+                )
+            if errors && errors.errorByField.password && (activeTab === `login`)
+              p.form__error-message= errors.errorByField.password.msg
+            input(type='hidden' name='_csrf' value=csrf)
             button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type='submit') Войти
+          if errors && errors.errorsList.length > 0 && (activeTab === `login`)
+            .form__validation-error
+              p.form__error-message При создании публикации произошли ошибки:
+              ul.form__errors
+                each error in errors.errorsList
+                  li.form__error= error
       .modal__overlay

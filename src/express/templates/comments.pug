@@ -18,6 +18,7 @@ block content
                   a.publication__item-text(href=`/articles/${article.id}`)= article.title
                   p.publication__text-strong= comment.text
                   form(action=`/articles/comments/${comment.id}/delete` method="POST")
+                    input(type='hidden' name='_csrf' value=csrf)
                     button.publication__button.button.button--close-item(type='submit')
                       span.visually-hidden Закрыть строку списка
               else

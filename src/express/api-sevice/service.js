@@ -173,6 +173,40 @@ class ApiService {
     }
   }
 
+  async logUser(userData) {
+    try {
+      return await this._api.post(`/users/login`, userData);
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.BAD_REQUEST) {
+        const {data: {errors}} = response;
+        return {
+          validationError: true,
+          errors
+        };
+      }
+
+      throw err;
+    }
+  }
+
+  async checkUserAuth(accessToken) {
+    try {
+      return await this._api.post(`/users/auth`, {accessToken});
+    } catch (err) {
+      const {response} = err;
+
+      if (response.status === HttpCode.UNAUTHORIZED) {
+        return {
+          authError: true
+        };
+      }
+
+      throw err;
+    }
+  }
+
 }
 
 module.exports = ApiService;

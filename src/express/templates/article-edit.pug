@@ -99,6 +99,7 @@ block content
                     )= articleData ? articleData.fullText : article.fullText
                 if errors && errors.errorByField.fullText
                   p.form__error-message= errors.errorByField.fullText.msg
+                input(type='hidden' name='_csrf' value=csrf)
               if errors && errors.errorsList.length > 0
                 .form__validation-error
                   p.form__error-message При редактировании публикации произошли ошибки:

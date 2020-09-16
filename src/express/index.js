@@ -3,9 +3,11 @@
 const path = require(`path`);
 const express = require(`express`);
 const chalk = require(`chalk`);
+const cookieParser = require(`cookie-parser`);
 
 const ApiService = require(`./api-sevice/service`);
 const {createAPI} = require(`./axios-api`);
+const checkAuth = require(`./check-auth`);
 
 const {
   getArticlesRouter,
@@ -25,10 +27,12 @@ const app = express();
 
 app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
+app.use(checkAuth(service));
 app.use(`/`, getMainRouter(service));
 app.use(`/articles`, getArticlesRouter(service));
 app.use(`/my`, getMyRouter(service));

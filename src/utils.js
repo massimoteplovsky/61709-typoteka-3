@@ -3,6 +3,7 @@
 const fs = require(`fs`).promises;
 const moment = require(`moment`);
 const chalk = require(`chalk`);
+const jwt = require(`jsonwebtoken`);
 const {validationResult} = require(`express-validator`);
 
 const getRandomInt = (min, max) => {
@@ -117,6 +118,16 @@ const errorsListFormatter = ({msg}) => msg;
 const validateForm = (req) => validationResult(req).formatWith(errorsListFormatter).array();
 const validateFormByFields = (req) => validationResult(req).mapped();
 
+const generateTokens = (tokenData) => {
+  const accessToken = jwt.sign({id: tokenData}, process.env.JWT_ACCESS_SECRET);
+  const refreshToken = jwt.sign({id: tokenData}, process.env.JWT_REFRESH_SECRET);
+
+  return {
+    accessToken,
+    refreshToken
+  };
+};
+
 module.exports = {
   getRandomInt,
   shuffle,
@@ -128,5 +139,6 @@ module.exports = {
   highlightArticleTitle,
   truncateText,
   validateForm,
-  validateFormByFields
+  validateFormByFields,
+  generateTokens
 };

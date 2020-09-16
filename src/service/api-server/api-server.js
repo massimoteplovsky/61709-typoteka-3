@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require(`express`);
+const cookieParser = require(`cookie-parser`);
 const expressPinoLogger = require(`express-pino-logger`);
 const {connectDB} = require(`../db-config/db`);
 const {getLogger} = require(`../logger`);
@@ -34,6 +35,7 @@ const getServer = async () => {
   server.disable(`x-powered-by`);
   server.use(expressPinoLogger(logger));
   server.use(express.json());
+  server.use(cookieParser());
 
   server.use((req, res, next) => {
     logger.debug(`Start request to url ${req.url}`);

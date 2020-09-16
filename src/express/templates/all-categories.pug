@@ -15,6 +15,7 @@ block content
           )
           label(for='add-form-add-category')
             span.visually-hidden Добавить категорию
+          input(type='hidden' name='_csrf' value=csrf)
           button.category__button.button.button--category(type='submit') Добавить
         if newCategoryError
           p.form__error-message= newCategoryError.title.msg
@@ -34,9 +35,11 @@ block content
                 )
                 label(for='modify-form-category-1')
                   span.visually-hidden Редактировать категорию
+                input(type='hidden' name='_csrf' value=csrf)
                 button.category__button.button.button--category(type='submit') Сохранить
               if Number(category.articlesCount) === 0
                 form(action=`/categories/${category.id}/delete` method="POST")
+                  input(type='hidden' name='_csrf' value=csrf)
                   button.category__button.button.button--category(type='submit') Удалить
             if error && categoryId && category.id === Number(categoryId)
               p.form__error-message(style=`padding: 0 37px;`)= error.title.msg

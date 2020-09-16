@@ -133,8 +133,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
 
     articleData = {
       ...articleData,
-      createdDate: convertDate(articleData.createdDate),
-      userId: 1
+      createdDate: convertDate(articleData.createdDate)
     };
 
     const newArticle = await articleService.createArticle(articleData);
@@ -170,8 +169,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
 
     articleData = {
       ...articleData,
-      createdDate: convertDate(articleData.createdDate),
-      userId: 1
+      createdDate: convertDate(articleData.createdDate)
     };
 
     const updatedArticle = await articleService.updateArticle(articleId, articleData);
@@ -240,7 +238,6 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
 
     commentFormData = {
       ...commentFormData,
-      userId: 2,
       articleId,
       createdDate: convertDate(moment())
     };

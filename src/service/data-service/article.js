@@ -135,7 +135,7 @@ class ArticleService {
         {
           model: Comment,
           as: `comments`,
-          include: [`users`]
+          include: [`users`],
         }
       ],
       order: sequelize.literal(`"comments"."createdDate" DESC`)

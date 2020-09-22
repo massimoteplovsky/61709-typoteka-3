@@ -20,7 +20,7 @@ class Article extends Sequelize.Model {
         allowNull: false
       },
       fullText: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true
       },
       picture: {

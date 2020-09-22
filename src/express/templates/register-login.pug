@@ -106,7 +106,6 @@ block content
                   type='password'
                   name='password'
                   placeholder='Пароль'
-                  value= userData && userData.password && (activeTab === `login`) ? userData.password : ``
                 )
             if errors && errors.errorByField.password && (activeTab === `login`)
               p.form__error-message= errors.errorByField.password.msg

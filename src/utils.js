@@ -98,12 +98,7 @@ const highlightArticleTitle = (articles, searchedText) => {
     const index = article.title.toLowerCase().indexOf(searchedText.toLowerCase());
 
     if (index !== -1) {
-      article.title = `
-        ${article.title.slice(0, index)}
-        <b>
-        ${article.title.slice(index, index + searchedText.length)}
-        </b>
-        ${article.title.slice(index + searchedText.length)}`;
+      article.title = `${article.title.slice(0, index)}<b>${article.title.slice(index, index + searchedText.length)}</b>${article.title.slice(index + searchedText.length)}`;
     }
 
     return article;

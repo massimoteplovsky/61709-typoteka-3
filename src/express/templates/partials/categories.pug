@@ -4,9 +4,10 @@ mixin categories(categories)
       h2.visually-hidden Список тем
       ul.themes
         each category in categories
-          li.themes__item
-            a(
-              class=`themes__item-link ${activeCategory && activeCategory.id === category.id ? `themes__item-link--active` : ``}`
-              href=`/articles/category/${category.id}`
-            )= `${category.title} `
-              sup= category.articlesCount
+          if category.articlesCount > 0
+            li.themes__item
+              a(
+                class=`themes__item-link ${activeCategory && activeCategory.id === category.id ? `themes__item-link--active` : ``}`
+                href=`/articles/category/${category.id}`
+              )= `${category.title} `
+                sup= category.articlesCount

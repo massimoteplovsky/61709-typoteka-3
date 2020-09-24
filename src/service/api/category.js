@@ -14,7 +14,7 @@ const getCategoryRouter = (categoryService) => {
     return res.status(HttpCode.SUCCESS).json(categories);
   });
 
-  categoryRouter.delete(`/:categoryId`, async (req, res) => {
+  categoryRouter.delete(`/:categoryId`, checkParamIsInteger, async (req, res) => {
     const {categoryId} = req.params;
     const category = await categoryService.findCategoryById(categoryId);
 

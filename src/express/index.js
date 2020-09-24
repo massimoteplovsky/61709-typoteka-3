@@ -5,7 +5,7 @@ const express = require(`express`);
 const chalk = require(`chalk`);
 const cookieParser = require(`cookie-parser`);
 
-const ApiService = require(`./api-sevice/service`);
+const ApiService = require(`./api-service/service`);
 const {createAPI} = require(`./axios-api`);
 const checkAuth = require(`./check-auth`);
 

@@ -84,7 +84,7 @@ block content
             button.form__submit-btn.form__submit-btn--register.button.button--colored(type='submit') Зарегистрироваться
           if errors && errors.errorsList.length > 0 && (activeTab === `register`)
             .form__validation-error
-              p.form__error-message При создании публикации произошли ошибки:
+              p.form__error-message При регистрации пользователя произошли ошибки:
               ul.form__errors
                 each error in errors.errorsList
                   li.form__error= error
@@ -106,7 +106,6 @@ block content
                   type='password'
                   name='password'
                   placeholder='Пароль'
-                  value= userData && userData.password && (activeTab === `login`) ? userData.password : ``
                 )
             if errors && errors.errorByField.password && (activeTab === `login`)
               p.form__error-message= errors.errorByField.password.msg
@@ -114,7 +113,7 @@ block content
             button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type='submit') Войти
           if errors && errors.errorsList.length > 0 && (activeTab === `login`)
             .form__validation-error
-              p.form__error-message При создании публикации произошли ошибки:
+              p.form__error-message При входе на сайт произошли ошибки:
               ul.form__errors
                 each error in errors.errorsList
                   li.form__error= error

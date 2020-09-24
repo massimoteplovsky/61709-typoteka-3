@@ -43,7 +43,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
     });
   });
 
-  articlesRouter.get(`/:articleId`, async (req, res) => {
+  articlesRouter.get(`/:articleId`, checkParamIsInteger, async (req, res) => {
     const {articleId} = req.params;
     const article = await articleService.findOne(articleId);
 
@@ -59,7 +59,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
     return res.status(HttpCode.SUCCESS).json(formatArticleDate(article.toJSON()));
   });
 
-  articlesRouter.delete(`/:articleId`, async (req, res) => {
+  articlesRouter.delete(`/:articleId`, checkParamIsInteger, async (req, res) => {
     const {articleId} = req.params;
     const article = await articleService.findOne(articleId);
 
@@ -77,7 +77,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
     return res.status(HttpCode.SUCCESS).json(deletedArticle);
   });
 
-  articlesRouter.get(`/category/:categoryId`, async (req, res) => {
+  articlesRouter.get(`/category/:categoryId`, checkParamIsInteger, async (req, res) => {
     const {activePage} = req.query;
     const {categoryId} = req.params;
     const isCategoryExist = await categoryService.findCategoryById(categoryId);
@@ -188,7 +188,8 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
       });
     }
 
-    const userArticles = await articleService.findUserArticlesWithComments(userId);
+    let userArticles = await articleService.findUserArticlesWithComments(userId);
+    userArticles = userArticles.filter((article) => article.comments.length > 0);
     return res.status(HttpCode.SUCCESS).json(formatArticleDate(userArticles));
   });
 
@@ -197,7 +198,7 @@ const getArticlesRouter = (articleService, commentService, categoryService, user
     return res.status(HttpCode.SUCCESS).json(lastArticlesComments);
   });
 
-  articlesRouter.get(`/users/:userId`, async (req, res) => {
+  articlesRouter.get(`/users/:userId`, checkParamIsInteger, async (req, res) => {
     const {userId} = req.params;
     const isUserExist = await userService.findUserById(userId);
 

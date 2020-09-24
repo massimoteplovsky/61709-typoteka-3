@@ -21,10 +21,11 @@ const getMyRouter = (service) => {
     }
   });
 
-  myRouter.get(`/comments`, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
+  myRouter.get(`/comments`, csrfProtection, checkAuth(service, RouteProtectionType.FULL, true), async (req, res, next) => {
     try {
-      const userArticlesWithComments = await service.getUserArticleComments(1);
-      return res.render(`comments`, {userArticlesWithComments});
+      const user = req.user;
+      const userArticlesWithComments = await service.getUserArticleComments(user.id);
+      return res.render(`comments`, {userArticlesWithComments, csrf: req.csrfToken()});
     } catch (err) {
       return next(err);
     }

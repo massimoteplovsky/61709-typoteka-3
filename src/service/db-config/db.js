@@ -41,7 +41,7 @@ const initDB = async () => {
     await sequelize.sync({force: true});
     console.info(`DB structure has been created`);
   } catch (err) {
-    logger.error(`DB init error: ${err}`);
+    logger.error(`DB init failed with error: ${err}`);
     process.exit(ExitCode.ERROR);
   }
 };
